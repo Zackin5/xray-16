@@ -26,6 +26,7 @@
 #include "Include/xrRender/FactoryPtr.h"
 #include "Render.h"
 #include "SDL.h"
+#include "openvr\openvr.h"  // TODO: proper OpenVR external include
 
 class engine_impl;
 
@@ -122,6 +123,7 @@ public:
     MessageRegistry<pureFrame> seqFrame;
 
     SDL_Window* m_sdlWnd;
+    vr::IVRSystem* openVr;
 };
 
 class ENGINE_API CRenderDeviceBase : public IRenderDevice, public CRenderDeviceData

@@ -72,6 +72,11 @@ void CRenderDevice::Initialize()
         SDL_SetWindowMinimumSize(m_sdlWnd, 256, 192);
         xrDebug::SetWindowHandler(this);
         ExtractAndSetWindowIcon(m_sdlWnd, icon);
+
+        Log("Initializing OpenVR...");
+
+        vr::EVRInitError vrError = vr::VRInitError_None;
+        openVr = vr::VR_Init(&vrError, vr::VRApplication_Scene);
     }
 }
 

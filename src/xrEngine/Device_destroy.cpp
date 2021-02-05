@@ -13,6 +13,9 @@ void CRenderDevice::Destroy()
     if (!b_is_Ready)
         return;
     Log("Destroying Render...");
+
+    vr::VR_Shutdown();
+
     b_is_Ready = false;
     Statistic->OnDeviceDestroy();
     GEnv.Render->OnDeviceDestroy(false);
