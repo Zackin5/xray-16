@@ -145,6 +145,9 @@
     <Filter Include="Interfaces\MonitorManager">
       <UniqueIdentifier>{fa21495d-605e-438d-8058-79e6ff670abe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="VR">
+      <UniqueIdentifier>{f11826c5-7118-4286-80b0-c55a01b98a99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="defines.h">
@@ -401,6 +404,9 @@
     </ClInclude>
     <ClInclude Include="embedded_resources_management.h">
       <Filter>General</Filter>
+    </ClInclude>
+    <ClInclude Include="VrMaths.cpp">
+      <Filter>VR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

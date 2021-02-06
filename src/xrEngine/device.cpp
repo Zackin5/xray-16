@@ -34,6 +34,7 @@
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
+#include "VrMaths.cpp"
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -262,7 +263,7 @@ bool CRenderDevice::BeforeFrame()
 void CRenderDevice::BeforeRender()
 {
     // Precache
-    if (dwPrecacheFrame)
+    /*if (dwPrecacheFrame)
     {
         float factor = float(dwPrecacheFrame) / float(dwPrecacheTotal);
         float angle = PI_MUL_2 * factor;
@@ -271,7 +272,24 @@ void CRenderDevice::BeforeRender()
         vCameraTop.set(0, 1, 0);
         vCameraRight.crossproduct(vCameraTop, vCameraDirection);
         mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
-    }
+    }*/
+
+    // Get HMD position
+    vr::TrackedDevicePose_t trackedPoses[1] = {};
+    openVr->GetDeviceToAbsoluteTrackingPose(vr::ETrackingUniverseOrigin::TrackingUniverseStanding, 0, trackedPoses, 1);
+
+    vCameraPosition.add(Matrix34ToFVector(trackedPoses[0].mDeviceToAbsoluteTracking));  // Add HMD pos to player pos
+    
+    auto hmdQuarternion = Matrix34ToQuaternion(trackedPoses[0].mDeviceToAbsoluteTracking);
+    vCameraDirection = QuaternionToAngles(hmdQuarternion);
+    vCameraDirection.normalize();
+    vCameraTop.set(0, 1, 0);
+    vCameraRight.crossproduct(vCameraTop, vCameraDirection);
+    mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
+
+    // Get projection matrix
+    auto ovrMatrix = openVr->GetProjectionMatrix(vr::Eye_Left, 0.0f, 1.0f);
+    Matrix44ToFmatrix(ovrMatrix, mProject);
 
     // Matrices
     mFullTransform.mul(mProject, mView);
