@@ -274,18 +274,23 @@ void CRenderDevice::BeforeRender()
         mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
     }*/
 
-    // Get HMD position
-    vr::TrackedDevicePose_t trackedPoses[1] = {};
-    openVr->GetDeviceToAbsoluteTrackingPose(vr::ETrackingUniverseOrigin::TrackingUniverseStanding, 0, trackedPoses, 1);
+    vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+    vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
-    vCameraPosition.add(Matrix34ToFVector(trackedPoses[0].mDeviceToAbsoluteTracking));  // Add HMD pos to player pos
+    // Get HMD position
+    vCameraPosition.add(
+        Matrix34ToFVector(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking)); // Add HMD pos to player pos
     
-    auto hmdQuarternion = Matrix34ToQuaternion(trackedPoses[0].mDeviceToAbsoluteTracking);
-    vCameraDirection = QuaternionToAngles(hmdQuarternion);
+    // TODO: get HMD rotation (or: skip position, calculate view matrix directly?)
+    /*auto hmdQuarternion = Matrix34ToQuaternion(trackedPoses[0].mDeviceToAbsoluteTracking);
+    //QuaternionToYawPitchRoll(hmdQuarternion, vCameraDirection);
+    //vCameraDirection = QuaternionToYawPitchRoll(hmdQuarternion);
+    //vCameraDirection = QuaternionToAngles(hmdQuarternion);
+    vCameraDirection = Matrix34ToYPR(trackedPoses[0].mDeviceToAbsoluteTracking);
     vCameraDirection.normalize();
     vCameraTop.set(0, 1, 0);
     vCameraRight.crossproduct(vCameraTop, vCameraDirection);
-    mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
+    mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);*/
 
     // Get projection matrix
     auto ovrMatrix = openVr->GetProjectionMatrix(vr::Eye_Left, 0.0f, 1.0f);
@@ -326,6 +331,25 @@ void CRenderDevice::DoRender()
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
+
+    // Openvr present draft
+    auto leftTexture = GEnv.Render->GetRenderTexture();
+    
+    auto gpuApiType = GEnv.Render->GetBackendAPI();
+    vr::ETextureType textureType{};
+
+    switch (gpuApiType)
+    {
+    default:
+    case IRender::BackendAPI::D3D9: textureType = vr::ETextureType::TextureType_Invalid; break; // DX9 unsupported
+    case IRender::BackendAPI::D3D10: textureType = vr::ETextureType::TextureType_DirectX; break;
+    case IRender::BackendAPI::D3D11: textureType = vr::ETextureType::TextureType_DirectX; break;
+    case IRender::BackendAPI::OpenGL: textureType = vr::ETextureType::TextureType_OpenGL; break;
+    }
+
+    vr::Texture_t vrTex = {leftTexture, textureType, vr::EColorSpace::ColorSpace_Auto};
+    vr::VRCompositor()->Submit(vr::EVREye::Eye_Left, &vrTex);
+    vr::VRCompositor()->Submit(vr::EVREye::Eye_Right, &vrTex);
 }
 
 void CRenderDevice::ProcessFrame()

@@ -274,6 +274,14 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     DXGI_SWAP_CHAIN_DESC1 desc{};
 
     // Back buffer
+    /*uint32_t* vrWidth{};
+    uint32_t* vrHeight{};
+
+    Device.openVr->GetRecommendedRenderTargetSize(vrWidth, vrHeight);
+
+    desc.Width = (UINT)*vrWidth;
+    desc.Height = (UINT)*vrHeight;*/
+
     desc.Width = Device.dwWidth;
     desc.Height = Device.dwHeight;
 
@@ -459,4 +467,12 @@ DeviceState CHW::GetDeviceState() const
     }
 
     return DeviceState::Normal;
+}
+
+ID3D11Texture2D* CHW::GetRenderTexture() 
+{
+    ID3D11Texture2D* postSurface{};
+    m_pSwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&postSurface);
+
+    return postSurface;
 }

@@ -441,4 +441,7 @@ public:
 
     virtual void ObtainRequiredWindowFlags(u32& windowFlags) = 0;
     virtual void MakeContextCurrent(RenderContext context) = 0;
+
+    // OpenVR functions
+    virtual void* GetRenderTexture() = 0;
 };

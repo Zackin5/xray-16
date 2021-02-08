@@ -317,3 +317,9 @@ void D3DXRenderBase::DumpStatistics(IGameFont& font, IPerformanceAlert* alert)
     }
     BasicStats.FrameStart();
 }
+
+void* D3DXRenderBase::GetRenderTexture() 
+{
+    auto d3d9Surface = HW.GetRenderTexture();
+    return d3d9Surface;
+}

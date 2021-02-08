@@ -221,3 +221,8 @@ bool CHW::ThisInstanceIsGlobal() const
 {
     return this == &HW;
 }
+
+void* CHW::GetRenderTexture() 
+{ 
+    return &pFB; // TODO: untested. probably doesn't work
+}

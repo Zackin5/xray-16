@@ -111,7 +111,7 @@ void CHW::CreateDevice(SDL_Window* m_sdlWnd)
             "Can not find matching format for back buffer.");
         xrDebug::DoExit("Failed to initialize graphics hardware.\nPlease try to restart the game.");
     }
-
+    
     // Set up the presentation parameters
     D3DPRESENT_PARAMETERS& P = DevPP;
     ZeroMemory(&P, sizeof(P));
@@ -421,4 +421,11 @@ DeviceState CHW::GetDeviceState() const
     }
 
     return DeviceState::Normal;
+}
+
+IDirect3DSurface9* CHW::GetRenderTexture()
+{
+    IDirect3DSurface9* d3d9Surface{};
+    pDevice->GetFrontBufferData(0, d3d9Surface);
+    return d3d9Surface;
 }

@@ -30,6 +30,9 @@ public:
     void Present();
     DeviceState GetDeviceState() const;
 
+    // OpenVR
+    IDirect3DSurface9* GetRenderTexture();
+
 private:
     u32 selectPresentInterval() const;
     u32 selectGPU() const;

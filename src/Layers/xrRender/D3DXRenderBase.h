@@ -218,6 +218,9 @@ public:
     void ObtainRequiredWindowFlags(u32& /*windowFlags*/) override {}
     void MakeContextCurrent(RenderContext /*context*/) override {}
 
+    // OpenVR
+    virtual void* GetRenderTexture() override;
+
 public:
     CResourceManager* Resources;
     ref_shader m_WireShader;

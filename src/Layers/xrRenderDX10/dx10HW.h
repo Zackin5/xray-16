@@ -41,6 +41,9 @@ public:
     void OnAppActivate() override;
     void OnAppDeactivate() override;
 
+    // OpenVR
+    ID3D11Texture2D* GetRenderTexture();
+
 private:
     void CreateSwapChain(HWND hwnd);
     bool CreateSwapChain2(HWND hwnd);

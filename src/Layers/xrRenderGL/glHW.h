@@ -27,6 +27,9 @@ public:
     void Present();
     DeviceState GetDeviceState() const;
 
+    // OpenVR
+    void* GetRenderTexture();
+
 private:
     bool ThisInstanceIsGlobal() const;
 
