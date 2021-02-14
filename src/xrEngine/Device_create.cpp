@@ -17,13 +17,18 @@ extern XRCDB_API bool* cdb_bDebug;
 void CRenderDevice::_SetupStates()
 {
     // General Render States
-    mView.identity();
-    mProject.identity();
-    mFullTransform.identity();
     vCameraPosition.set(0, 0, 0);
     vCameraDirection.set(0, 0, 1);
     vCameraTop.set(0, 1, 0);
     vCameraRight.set(1, 0, 0);
+
+    mView[vr::Eye_Left].identity();
+    mProject[vr::Eye_Left].identity();
+    mFullTransform[vr::Eye_Left].identity();
+    mView[vr::Eye_Right].identity();
+    mProject[vr::Eye_Right].identity();
+    mFullTransform[vr::Eye_Right].identity();
+
     GEnv.Render->SetupStates();
 }
 

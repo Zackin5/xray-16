@@ -468,7 +468,7 @@ void CRender::Calculate()
     r_ssaHZBvsTEX = _sqr(ps_r__ssaHZBvsTEX / 3) / g_fSCREEN;
 
     // Frustum & HOM rendering
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    ViewBase.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
@@ -514,7 +514,7 @@ void CRender::Calculate()
     if (pLastSector)
     {
         // Traverse sector/portal structure
-        PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform,
+        PortalTraverser.traverse(pLastSector, ViewBase, Device.vCameraPosition, Device.mFullTransform[Device.activeRenderEye],
             CPortalTraverser::VQ_HOM + CPortalTraverser::VQ_SSA + CPortalTraverser::VQ_FADE);
 
         // Determine visibility for static geometry hierarchy

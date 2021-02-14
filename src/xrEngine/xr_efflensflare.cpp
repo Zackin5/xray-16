@@ -455,48 +455,6 @@ void CLensFlare::OnFrame(shared_str id)
 
     // blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
     blend_lerp(fBlend, fVisResult, BLEND_DEC_SPEED, Device.fTimeDelta);
-
-/*
-IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
-STranspParam TP (&m_ray_cache,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
-collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
-if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
-// similar with previous query == 0
-TP.vis = 0.f;
-}else{
-float _u,_v,_range;
-if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
-TP.vis = 0.f;
-}else{
-// cache outdated. real query.
-r_dest.r_clear ();
-if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
-m_ray_cache.result = false ;
-}
-}
-
-blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
-*/
-/*
- IGameObject* o_main = g_pGameLevel->CurrentViewEntity();
- STranspParam TP (this,Device.vCameraPosition,vSunDir,1000.f,EPS_L);
- collide::ray_defs RD (TP.P,TP.D,TP.f,CDB::OPT_CULL,collide::rqtBoth);
- if (m_ray_cache.result&&m_ray_cache.similar(TP.P,TP.D,TP.f)){
- // similar with previous query == 0
- TP.vis = 0.f;
- }else{
- float _u,_v,_range;
- if (CDB::TestRayTri(TP.P,TP.D,m_ray_cache.verts,_u,_v,_range,false)&&(_range>0 && _range<TP.f)){
- TP.vis = 0.f;
- }else{
- // cache outdated. real query.
- r_dest.r_clear ();
- if (g_pGameLevel->ObjectSpace.RayQuery (r_dest,RD,material_callback,&TP,NULL,o_main))
- m_ray_cache.result = false ;
- }
- }
- blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
- */
 #endif
     clamp(fBlend, 0.0f, 1.0f);
 
@@ -504,7 +462,7 @@ blend_lerp(fBlend,TP.vis,BLEND_DEC_SPEED,Device.fTimeDelta);
     if (m_Current->m_Flags.is(CLensFlareDescriptor::flGradient))
     {
         Fvector scr_pos;
-        Device.mFullTransform.transform(scr_pos, vecLight);
+        Device.mFullTransform[Device.activeRenderEye].transform(scr_pos, vecLight);
         float kx = 1, ky = 1;
         float sun_blend = 0.5f;
         float sun_max = 2.5f;

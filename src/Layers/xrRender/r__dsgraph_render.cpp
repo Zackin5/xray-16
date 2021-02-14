@@ -345,8 +345,8 @@ public:
         extern ENGINE_API float psHUD_FOV;
 
         // Change projection
-        Pold  = Device.mProject;
-        FTold = Device.mFullTransform;
+        Pold  = Device.mProject[Device.activeRenderEye];
+        FTold = Device.mFullTransform[Device.activeRenderEye];
 
         // XXX: Xottab_DUTY: custom FOV. Implement it someday
         // It should be something like this:
@@ -356,7 +356,7 @@ public:
         // else
         //     customFOV = psHUD_FOV * Device.fFOV;
         //
-        // Device.mProject.build_projection(deg2rad(customFOV), Device.fASPECT,
+        // Device.mProject[Device.activeRenderEye].build_projection(deg2rad(customFOV), Device.fASPECT,
         //    VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
         //
         // Look at the function:
@@ -364,11 +364,11 @@ public:
         // In the commit:
         // https://github.com/ShokerStlk/xray-16-SWM/commit/869de0b6e74ac05990f541e006894b6fe78bd2a5#diff-4199ef700b18ce4da0e2b45dee1924d0R83
 
-        Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+        Device.mProject[Device.activeRenderEye].build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
             VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
-        Device.mFullTransform.mul(Device.mProject, Device.mView);
-        RCache.set_xform_project(Device.mProject);
+        Device.mFullTransform[Device.activeRenderEye].mul(Device.mProject[Device.activeRenderEye], Device.mView[Device.activeRenderEye]);
+        RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 
         RImplementation.rmNear();
 
@@ -382,9 +382,9 @@ public:
         RImplementation.rmNormal();
 
         // Restore projection
-        Device.mProject = Pold;
-        Device.mFullTransform = FTold;
-        RCache.set_xform_project(Device.mProject);
+        Device.mProject[Device.activeRenderEye] = Pold;
+        Device.mFullTransform[Device.activeRenderEye] = FTold;
+        RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
         // restore culling mode
         RCache.set_CullMode(cullMode);
         isActive = false;

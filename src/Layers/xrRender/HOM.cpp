@@ -20,7 +20,7 @@ void __stdcall CHOM::MT_RENDER()
     if (MT_frame_rendered != Device.dwFrame)
     {
         CFrustum ViewBase;
-        ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+        ViewBase.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
         Enable();
         Render(ViewBase);
     }
@@ -189,8 +189,8 @@ void CHOM::Render_DB(CFrustum& base)
     Fmatrix m_viewport_01 = {1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, -1.f / 2.f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
         1.f / 2.f + 0 + 0, 1.f / 2.f + 0 + 0, 0.0f, 1.0f};
 #endif // !USE_OGL
-    m_xform.mul(m_viewport, Device.mFullTransform);
-    m_xform_01.mul(m_viewport_01, Device.mFullTransform);
+    m_xform.mul(m_viewport, Device.mFullTransform[Device.activeRenderEye]);
+    m_xform_01.mul(m_viewport_01, Device.mFullTransform[Device.activeRenderEye]);
 
     // Query DB
     xrc.frustum_options(0);
@@ -208,7 +208,7 @@ void CHOM::Render_DB(CFrustum& base)
 
     // Build frustum with near plane only
     CFrustum clip;
-    clip.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_NEAR);
+    clip.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_NEAR);
     sPoly src, dst;
     u32 _frame = Device.dwFrame;
     stats.FrustumTriangleCount = xrc.r_count();

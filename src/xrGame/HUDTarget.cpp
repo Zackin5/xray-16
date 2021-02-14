@@ -136,7 +136,7 @@ void CHUDTarget::Render()
     Fvector p2;
     p2.mad(p1, dir, PP.RQ.range);
     Fvector4 pt;
-    Device.mFullTransform.transform(pt, p2);
+    Device.mFullTransform[Device.activeRenderEye].transform(pt, p2);
     pt.y = -pt.y;
     float di_size = C_SIZE / powf(pt.w, .2f);
 

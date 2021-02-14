@@ -670,17 +670,18 @@ void CParticleEffect::Render(float)
             if (dwCount)
             {
 #ifndef _EDITOR
-                Fmatrix Pold = Device.mProject;
-                Fmatrix FTold = Device.mFullTransform;
+                Fmatrix Pold = Device.mProject[Device.activeRenderEye];
+                Fmatrix FTold = Device.mFullTransform[Device.activeRenderEye];
                 if (GetHudMode())
                 {
-                    RDEVICE.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
+                    RDEVICE.mProject[RDEVICE.activeRenderEye].build_projection(deg2rad(psHUD_FOV * Device.fFOV),
+                        Device.fASPECT, VIEWPORT_NEAR,
                         g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
-                    Device.mFullTransform.mul(Device.mProject, Device.mView);
-                    RCache.set_xform_project(Device.mProject);
+                    Device.mFullTransform[Device.activeRenderEye].mul(Device.mProject[Device.activeRenderEye], Device.mView[Device.activeRenderEye]);
+                    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
                     RImplementation.rmNear();
-                    ApplyTexgen(Device.mFullTransform);
+                    ApplyTexgen(Device.mFullTransform[Device.activeRenderEye]);
                 }
 #endif
 
@@ -696,10 +697,10 @@ void CParticleEffect::Render(float)
                 if (GetHudMode())
                 {
                     RImplementation.rmNormal();
-                    Device.mProject = Pold;
-                    Device.mFullTransform = FTold;
-                    RCache.set_xform_project(Device.mProject);
-                    ApplyTexgen(Device.mFullTransform);
+                    Device.mProject[Device.activeRenderEye] = Pold;
+                    Device.mFullTransform[Device.activeRenderEye] = FTold;
+                    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
+                    ApplyTexgen(Device.mFullTransform[Device.activeRenderEye]);
                 }
 #endif
             }
@@ -838,17 +839,17 @@ void CParticleEffect::Render(float)
             if (dwCount)
             {
 #ifndef _EDITOR
-                Fmatrix Pold = Device.mProject;
-                Fmatrix FTold = Device.mFullTransform;
+                Fmatrix Pold = Device.mProject[Device.activeRenderEye];
+                Fmatrix FTold = Device.mFullTransform[Device.activeRenderEye];
                 if (GetHudMode())
                 {
-                    RDEVICE.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
+                    RDevice.mProject[Device.activeRenderEye].build_projection(deg2rad(psHUD_FOV * Device.fFOV), Device.fASPECT, VIEWPORT_NEAR,
                         g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
-                    Device.mFullTransform.mul(Device.mProject, Device.mView);
-                    RCache.set_xform_project(Device.mProject);
+                    Device.mFullTransform[Device.activeRenderEye].mul(Device.mProject[Device.activeRenderEye], Device.mView[Device.activeRenderEye]);
+                    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
                     RImplementation.rmNear();
-                    ApplyTexgen(Device.mFullTransform);
+                    ApplyTexgen(Device.mFullTransform[Device.activeRenderEye]);
                 }
 #endif
 
@@ -864,10 +865,10 @@ void CParticleEffect::Render(float)
                 if (GetHudMode())
                 {
                     RImplementation.rmNormal();
-                    Device.mProject = Pold;
-                    Device.mFullTransform = FTold;
-                    RCache.set_xform_project(Device.mProject);
-                    ApplyTexgen(Device.mFullTransform);
+                    Device.mProject[Device.activeRenderEye] = Pold;
+                    Device.mFullTransform[Device.activeRenderEye] = FTold;
+                    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
+                    ApplyTexgen(Device.mFullTransform[Device.activeRenderEye]);
                 }
 #endif
             }

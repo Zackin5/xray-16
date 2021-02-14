@@ -34,11 +34,13 @@ void setup_lm_screenshot_matrices()
     Device.vCameraDirection.set(0.f, -1.f, 0.f);
     Device.vCameraTop.set(0.f, 0.f, 1.f);
     Device.vCameraRight.set(1.f, 0.f, 0.f);
-    Device.mView.build_camera_dir(Device.vCameraPosition, Device.vCameraDirection, Device.vCameraTop);
+    Device.mView[Device.activeRenderEye].build_camera_dir(Device.vCameraPosition,
+        Device.vCameraDirection, Device.vCameraTop);
 
-    bb.xform(Device.mView);
+    bb.xform(Device.mView[Device.activeRenderEye]);
     // build project matrix
-    Device.mProject.build_projection_ortho(bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMin.z, bb.vMax.z);
+    Device.mProject[Device.activeRenderEye].build_projection_ortho(
+        bb.vMax.x - bb.vMin.x, bb.vMax.y - bb.vMin.y, bb.vMin.z, bb.vMax.z);
 }
 
 Fbox get_level_screenshot_bound()
@@ -75,7 +77,7 @@ CDemoRecord::CDemoRecord(const char* name, float life_time) : CEffectorCam(cefDe
     {
         g_position.set_position = false;
         IR_Capture(); // capture input
-        m_Camera.invert(Device.mView);
+        m_Camera.invert(Device.mView[Device.activeRenderEye]);
 
         // parse yaw
         Fvector& dir = m_Camera.k;

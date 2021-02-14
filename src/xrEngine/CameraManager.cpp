@@ -316,8 +316,9 @@ void CCameraManager::UpdatePPEffectors()
 
 void CCameraManager::ApplyDevice()
 {
+    // TODO: move OpenVr tracking calculations here??
     // Device params
-    Device.mView.build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
+    //Device.mView[0].build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
 
     Device.vCameraPosition.set(m_cam_info.p);
     Device.vCameraDirection.set(m_cam_info.d);
@@ -327,11 +328,11 @@ void CCameraManager::ApplyDevice()
     // projection
     Device.fFOV = m_cam_info.fFov;
     Device.fASPECT = m_cam_info.fAspect;
-    Device.mProject.build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
+    //Device.mProject[0].build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
     
     // Apply offset required for Nvidia Ansel
-    Device.mProject._31 = -m_cam_info.offsetX;
-    Device.mProject._32 = -m_cam_info.offsetY;
+    //Device.mProject[Device.activeRenderEye]._31 = -m_cam_info.offsetX;
+    //Device.mProject[Device.activeRenderEye]._32 = -m_cam_info.offsetY;
 
     if (g_pGamePersistent && g_pGamePersistent->m_pMainMenu->IsActive())
         ResetPP();
@@ -384,7 +385,7 @@ void CCameraManager::Dump()
     Fmatrix mInvCamera;
     Fvector _R, _U, _T, _P;
 
-    mInvCamera.invert(Device.mView);
+    mInvCamera.invert(Device.mView[Device.activeRenderEye]);
     _R.set(mInvCamera._11, mInvCamera._12, mInvCamera._13);
     _U.set(mInvCamera._21, mInvCamera._22, mInvCamera._23);
     _T.set(mInvCamera._31, mInvCamera._32, mInvCamera._33);

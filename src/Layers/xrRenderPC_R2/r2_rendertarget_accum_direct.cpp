@@ -41,7 +41,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     float L_spec;
     L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
     L_spec = u_diffuse2s(L_clr);
-    Device.mView.transform_dir(L_dir, fuckingsun->direction);
+    Device.mView[Device.activeRenderEye].transform_dir(L_dir, fuckingsun->direction);
     L_dir.normalize();
 
     // Perform masking (only once - on the first/near phase)
@@ -79,7 +79,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
     // recalculate d_Z, to perform depth-clipping
     Fvector center_pt;
     center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r2_sun_near);
-    Device.mFullTransform.transform(center_pt);
+    Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
     d_Z = center_pt.z;
 
     // nv-stencil recompression
@@ -106,7 +106,7 @@ void CRenderTarget::accum_direct(u32 sub_phase)
         // compute xforms
         FPU::m64r();
         Fmatrix xf_invview;
-        xf_invview.invert(Device.mView);
+        xf_invview.invert(Device.mView[Device.activeRenderEye]);
 
         // shadow xform
         Fmatrix m_shadow;
@@ -193,11 +193,11 @@ void CRenderTarget::accum_direct(u32 sub_phase)
             zMax = OLES_SUN_LIMIT_27_01_07;
         }
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMin);
-        Device.mFullTransform.transform(center_pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
         zMin = center_pt.z;
 
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMax);
-        Device.mFullTransform.transform(center_pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
         zMax = center_pt.z;
 
         if (u_DBT_enable(zMin, zMax))
@@ -265,7 +265,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     float L_spec;
     L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
     L_spec = u_diffuse2s(L_clr);
-    Device.mView.transform_dir(L_dir, fuckingsun->direction);
+    Device.mView[Device.activeRenderEye].transform_dir(L_dir, fuckingsun->direction);
     L_dir.normalize();
 
     // Perform masking (only once - on the first/near phase)
@@ -303,7 +303,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
     // recalculate d_Z, to perform depth-clipping
     Fvector center_pt;
     center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r2_sun_near);
-    Device.mFullTransform.transform(center_pt);
+    Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
     d_Z = center_pt.z;
 
     // nv-stencil recompression
@@ -331,7 +331,7 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         // compute xforms
         FPU::m64r();
         Fmatrix xf_invview;
-        xf_invview.invert(Device.mView);
+        xf_invview.invert(Device.mView[Device.activeRenderEye]);
 
         // shadow xform
         Fmatrix m_shadow;
@@ -380,8 +380,8 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
         Fmatrix m_Texgen;
         m_Texgen.identity();
         RCache.xforms.set_W(m_Texgen);
-        RCache.xforms.set_V(Device.mView);
-        RCache.xforms.set_P(Device.mProject);
+        RCache.xforms.set_V(Device.mView[Device.activeRenderEye]);
+        RCache.xforms.set_P(Device.mProject[Device.activeRenderEye]);
         u_compute_texgen_screen(m_Texgen);
 
         // Make jitter texture
@@ -458,11 +458,11 @@ void CRenderTarget::accum_direct_cascade(u32 sub_phase, Fmatrix& xform, Fmatrix&
             zMax = OLES_SUN_LIMIT_27_01_07;
         }
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMin);
-        Device.mFullTransform.transform(center_pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
         zMin = center_pt.z;
 
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMax);
-        Device.mFullTransform.transform(center_pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
         zMax = center_pt.z;
 
         if (u_DBT_enable(zMin, zMax))
@@ -583,7 +583,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     float L_spec;
     L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
     L_spec = u_diffuse2s(L_clr);
-    Device.mView.transform_dir(L_dir, fuckingsun->direction);
+    Device.mView[Device.activeRenderEye].transform_dir(L_dir, fuckingsun->direction);
     L_dir.normalize();
 
     // Perform masking (only once - on the first/near phase)
@@ -623,7 +623,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
     // recalculate d_Z, to perform depth-clipping
     Fvector center_pt;
     center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r2_sun_near);
-    Device.mFullTransform.transform(center_pt);
+    Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
     d_Z = center_pt.z;
 
     // nv-stencil recompression
@@ -648,7 +648,7 @@ void CRenderTarget::accum_direct_f(u32 sub_phase)
         {
             FPU::m64r();
             Fmatrix xf_invview;
-            xf_invview.invert(Device.mView);
+            xf_invview.invert(Device.mView[Device.activeRenderEye]);
             Fmatrix xf_project;
             xf_project.mul(m_TexelAdjust, fuckingsun->X.D.combine);
             m_shadow.mul(xf_project, xf_invview);
@@ -725,13 +725,13 @@ void CRenderTarget::accum_direct_lum()
     float L_spec;
     L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
     L_spec = u_diffuse2s(L_clr);
-    Device.mView.transform_dir(L_dir, fuckingsun->direction);
+    Device.mView[Device.activeRenderEye].transform_dir(L_dir, fuckingsun->direction);
     L_dir.normalize();
 
     // recalculate d_Z, to perform depth-clipping
     Fvector center_pt;
     center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r2_sun_near);
-    Device.mFullTransform.transform(center_pt);
+    Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
     d_Z = center_pt.z;
 
     // nv-stencil recompression
@@ -871,8 +871,8 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
         Fmatrix m_Texgen;
         m_Texgen.identity();
         RCache.xforms.set_W(m_Texgen);
-        RCache.xforms.set_V(Device.mView);
-        RCache.xforms.set_P(Device.mProject);
+        RCache.xforms.set_V(Device.mView[Device.activeRenderEye]);
+        RCache.xforms.set_P(Device.mProject[Device.activeRenderEye]);
         u_compute_texgen_screen(m_Texgen);
 
         RCache.set_c("m_texgen", m_Texgen);
@@ -899,11 +899,11 @@ void CRenderTarget::accum_direct_volumetric(u32 sub_phase, const u32 Offset, con
 
         Fvector center_pt;
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMin);
-        Device.mFullTransform.transform(center_pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
         zMin = center_pt.z;
 
         center_pt.mad(Device.vCameraPosition, Device.vCameraDirection, zMax);
-        Device.mFullTransform.transform(center_pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(center_pt);
         zMax = center_pt.z;
 
         if (u_DBT_enable(zMin, zMax))

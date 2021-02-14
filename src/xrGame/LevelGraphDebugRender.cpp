@@ -189,7 +189,7 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
     font.SetColor(color_xrgb(255, 255, 0));
     bool showText = true;
     Fvector4 temp;
-    Device.mFullTransform.transform(temp, pos);
+    Device.mFullTransform[Device.activeRenderEye].transform(temp, pos);
     font.OutSetI(temp.x, -temp.y);
     font.SetHeightI(0.05f / _sqrt(temp.w));
     if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
@@ -260,7 +260,7 @@ void LevelGraphDebugRender::DrawStalkers(int vid)
         direction.add(pos1);
         render.draw_aabb(direction, radius, radius, radius, color);
         Fvector4 temp;
-        Device.mFullTransform.transform(temp, direction);
+        Device.mFullTransform[Device.activeRenderEye].transform(temp, direction);
         if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
             continue;
         font.SetHeightI(0.05f / _sqrt(temp.w));
@@ -284,7 +284,7 @@ void LevelGraphDebugRender::DrawObjects(int vid)
         position = ConvertPosition(vertex.game_point());
     font.SetColor(color_xrgb(255, 255, 0));
     Fvector4 temp;
-    Device.mFullTransform.transform(temp, position);
+    Device.mFullTransform[Device.activeRenderEye].transform(temp, position);
     font.OutSetI(temp.x, -temp.y);
     font.SetHeightI(0.05f / _sqrt(temp.w));
     bool showText = true;
@@ -356,7 +356,7 @@ void LevelGraphDebugRender::DrawObjects(int vid)
         direction.add(pos1);
         render.draw_aabb(direction, radius, radius, radius, color);
         Fvector4 temp;
-        Device.mFullTransform.transform(temp, direction);
+        Device.mFullTransform[Device.activeRenderEye].transform(temp, direction);
         if (temp.z < 0 || temp.w < 0 || _abs(temp.x) > 1 || _abs(temp.y) > 1)
             continue;
         font.SetHeightI(0.05f / _sqrt(temp.w));
@@ -426,7 +426,7 @@ void LevelGraphDebugRender::DrawGameGraph()
         T.set(t1);
         //T.y+= 1.5f;
         T.y += 1.5f / 10.f;
-        Device.mFullTransform.transform(S, T);
+        Device.mFullTransform[Device.activeRenderEye].transform(S, T);
         //out of screen
         if (S.z < 0 || S.w < 0)
             continue;
@@ -474,7 +474,7 @@ void LevelGraphDebugRender::DrawGameGraph()
                 T.set(t1);
                 //T.y+= 1.5f;
                 T.y += 1.5f;
-                Device.mFullTransform.transform(S, T);
+                Device.mFullTransform[Device.activeRenderEye].transform(S, T);
                 //out of screen
                 if (S.z < 0 || S.w < 0)
                     continue;
@@ -682,7 +682,7 @@ void LevelGraphDebugRender::DrawNodes()
                 Fvector offsetPos = vertexPos;
                 offsetPos.y += 0.3f;
                 Fvector4 tsmPos;
-                Device.mFullTransform.transform(tsmPos, offsetPos);
+                Device.mFullTransform[Device.activeRenderEye].transform(tsmPos, offsetPos);
                 if (tsmPos.z < 0 || tsmPos.w < 0 || _abs(tsmPos.x) > 1 || _abs(tsmPos.y) > 1)
                     continue;
                 font->SetHeightI(0.05f / _sqrt(_abs(tsmPos.w)));

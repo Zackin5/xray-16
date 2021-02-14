@@ -91,9 +91,12 @@ public:
     Fvector vCameraTop;
     Fvector vCameraRight;
 
-    Fmatrix mView;
-    Fmatrix mProject;
-    Fmatrix mFullTransform;
+    // Index 0 is left eye, 1 is right eye
+    Fmatrix mView[2];
+    Fmatrix mProject[2];
+    Fmatrix mFullTransform[2];
+    Fmatrix mInvFullTransform[2];
+    int activeRenderEye;
 
     // Copies of corresponding members. Used for synchronization.
     Fvector vCameraPositionSaved;
@@ -101,9 +104,9 @@ public:
     Fvector vCameraTopSaved;
     Fvector vCameraRightSaved;
 
-    Fmatrix mViewSaved;
-    Fmatrix mProjectSaved;
-    Fmatrix mFullTransformSaved;
+    Fmatrix mViewSaved[2];
+    Fmatrix mProjectSaved[2];
+    Fmatrix mFullTransformSaved[2];
 
     float fFOV;
     float fASPECT;
@@ -166,14 +169,14 @@ public:
         if (enabled && !m_bNearer)
         {
             m_bNearer = true;
-            mProject._43 -= EPS_L;
+            mProject[activeRenderEye]._43 -= EPS_L;
         }
         else if (!enabled && m_bNearer)
         {
             m_bNearer = false;
-            mProject._43 += EPS_L;
+            mProject[activeRenderEye]._43 += EPS_L;
         }
-        GEnv.Render->SetCacheXform(mView, mProject);
+        GEnv.Render->SetCacheXform(mView[activeRenderEye], mProject[activeRenderEye]);
         // R_ASSERT(0);
         // TODO: re-implement set projection
         // RCache.set_xform_project (mProject);
@@ -186,7 +189,6 @@ public:
     MessageRegistry<pureUIReset> seqUIReset;
     xr_vector<fastdelegate::FastDelegate0<>> seqParallel;
 
-    Fmatrix mInvFullTransform;
 
     CRenderDevice()
         : dwPrecacheTotal(0), fWidth_2(0), fHeight_2(0),
@@ -218,11 +220,25 @@ public:
     bool BeforeFrame();
     void FrameMove();
 
-    void BeforeRender();
+    /*
+    2D render prep
+    */
+    //void BeforeRender();
+    /*
+    Stereo VR prep
+    */
+    void OpenVr_BeforeRender();
     void DoRender();
     bool RenderBegin();
     void Clear();
     void RenderEnd();
+
+    void OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose);
+
+    /*
+    Renders current framebuffer texture to VR HMD eye
+    */
+    void OpenVr_PresentBufferToVR(vr::EVREye vrEye);
 
     void overdrawBegin();
     void overdrawEnd();

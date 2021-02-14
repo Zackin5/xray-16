@@ -50,7 +50,7 @@ void CRender::render_rain()
         //
         const float fRainFar = ps_r3_dyn_wet_surf_far;
         ex_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, fRainFar);
-        ex_full.mul(ex_project, Device.mView);
+        ex_full.mul(ex_project, Device.mView[Device.activeRenderEye]);
         D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
 
         //	Calculate view frustum were we can see dynamic rain radius
@@ -257,8 +257,8 @@ void CRender::render_rain()
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 
     // Accumulate
     Target->phase_rain();

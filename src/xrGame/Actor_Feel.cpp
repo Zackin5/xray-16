@@ -136,7 +136,7 @@ void CActor::PickupModeUpdate()
     feel_touch_update(Position(), m_fPickupInfoRadius);
 
     CFrustum frustum;
-    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    frustum.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     for (xr_vector<IGameObject*>::iterator it = feel_touch.begin(); it != feel_touch.end(); ++it)
     {
@@ -159,7 +159,7 @@ void CActor::PickupModeUpdate_COD()
     };
 
     CFrustum frustum;
-    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    frustum.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     ISpatialResult.clear();
     g_SpatialSpace->q_frustum(ISpatialResult, 0, STYPE_COLLIDEABLE, frustum);
@@ -210,7 +210,7 @@ void CActor::PickupModeUpdate_COD()
     if (pNearestItem)
     {
         CFrustum frustum;
-        frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+        frustum.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
         if (!CanPickItem(frustum, Device.vCameraPosition, &pNearestItem->object()))
             pNearestItem = NULL;
     }
@@ -303,7 +303,7 @@ void CActor::PickupInfoDraw(IGameObject* object)
         return;
 
     Fmatrix res;
-    res.mul(Device.mFullTransform, object->XFORM());
+    res.mul(Device.mFullTransform[Device.activeRenderEye], object->XFORM());
     Fvector4 v_res;
     Fvector shift;
 

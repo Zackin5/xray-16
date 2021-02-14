@@ -260,10 +260,11 @@ bool CRenderDevice::BeforeFrame()
     return true;
 }
 
+/*
 void CRenderDevice::BeforeRender()
 {
     // Precache
-    /*if (dwPrecacheFrame)
+    if (dwPrecacheFrame)
     {
         float factor = float(dwPrecacheFrame) / float(dwPrecacheTotal);
         float angle = PI_MUL_2 * factor;
@@ -272,30 +273,8 @@ void CRenderDevice::BeforeRender()
         vCameraTop.set(0, 1, 0);
         vCameraRight.crossproduct(vCameraTop, vCameraDirection);
         mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
-    }*/
-
-    vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
-    vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
-
-    // Get HMD position
-    vCameraPosition.add(
-        Matrix34ToFVector(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking)); // Add HMD pos to player pos
+    }
     
-    // TODO: get HMD rotation (or: skip position, calculate view matrix directly?)
-    /*auto hmdQuarternion = Matrix34ToQuaternion(trackedPoses[0].mDeviceToAbsoluteTracking);
-    //QuaternionToYawPitchRoll(hmdQuarternion, vCameraDirection);
-    //vCameraDirection = QuaternionToYawPitchRoll(hmdQuarternion);
-    //vCameraDirection = QuaternionToAngles(hmdQuarternion);
-    vCameraDirection = Matrix34ToYPR(trackedPoses[0].mDeviceToAbsoluteTracking);
-    vCameraDirection.normalize();
-    vCameraTop.set(0, 1, 0);
-    vCameraRight.crossproduct(vCameraTop, vCameraDirection);
-    mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);*/
-
-    // Get projection matrix
-    auto ovrMatrix = openVr->GetProjectionMatrix(vr::Eye_Left, 0.0f, 1.0f);
-    Matrix44ToFmatrix(ovrMatrix, mProject);
-
     // Matrices
     mFullTransform.mul(mProject, mView);
     GEnv.Render->SetCacheXform(mView, mProject);
@@ -309,6 +288,76 @@ void CRenderDevice::BeforeRender()
     mFullTransformSaved = mFullTransform;
     mViewSaved = mView;
     mProjectSaved = mProject;
+}*/
+
+void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose) 
+{
+    // TODO: get proper z near/far values from camera
+    auto fNear = 0.2f;
+    auto fFar = 100.0f;
+    // Get projection matrix
+    auto ovrMatrix = openVr->GetProjectionMatrix(vrEye, fNear, fFar);
+    Matrix44ToFmatrix(ovrMatrix, mProject[vrEye]);
+    
+    mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
+    mProject[vrEye].build_projection(deg2rad(fFOV), fASPECT, fNear, fFar);  // TODO: use OpenVR projection
+
+    // Matrices
+    mFullTransform[vrEye].mul(mProject[vrEye], mView[vrEye]);
+    GEnv.Render->SetCacheXform(mView[vrEye], mProject[vrEye]);
+    mInvFullTransform[vrEye].invert_44(mFullTransform[vrEye]);
+
+    vCameraPositionSaved[vrEye] = vCameraPosition[vrEye];
+    vCameraDirectionSaved[vrEye] = vCameraDirection[vrEye];
+    vCameraTopSaved[vrEye] = vCameraTop[vrEye];
+    vCameraRightSaved[vrEye] = vCameraRight[vrEye];
+
+    mFullTransformSaved[vrEye] = mFullTransform[vrEye];
+    mViewSaved[vrEye] = mView[vrEye];
+    mProjectSaved[vrEye] = mProject[vrEye];
+}
+
+void CRenderDevice::OpenVr_BeforeRender()
+{
+    vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+    vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
+
+    // Get HMD position
+    vCameraPosition.add(Matrix34ToFVector(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking)); // Add HMD pos to player pos
+
+    // TODO: get HMD rotation (or: skip position, calculate view matrix directly?)
+    /*auto hmdQuarternion = Matrix34ToQuaternion(trackedPoses[0].mDeviceToAbsoluteTracking);
+    //QuaternionToYawPitchRoll(hmdQuarternion, vCameraDirection);
+    //vCameraDirection = QuaternionToYawPitchRoll(hmdQuarternion);
+    //vCameraDirection = QuaternionToAngles(hmdQuarternion);
+    vCameraDirection = Matrix34ToYPR(trackedPoses[0].mDeviceToAbsoluteTracking);
+    vCameraDirection.normalize();
+    vCameraTop.set(0, 1, 0);
+    vCameraRight.crossproduct(vCameraTop, vCameraDirection);
+    mView.build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);*/
+
+    OpenVr_CalcEyeMatrix(vr::Eye_Left, m_rTrackedDevicePose[0]);
+    OpenVr_CalcEyeMatrix(vr::Eye_Right, m_rTrackedDevicePose[0]);
+}
+
+void CRenderDevice::OpenVr_PresentBufferToVR(vr::EVREye vrEye)
+{
+    auto leftTexture = GEnv.Render->GetRenderTexture();
+
+    auto gpuApiType = GEnv.Render->GetBackendAPI();
+    vr::ETextureType textureType{};
+
+    switch (gpuApiType)
+    {
+    default:
+    case IRender::BackendAPI::D3D9: textureType = vr::ETextureType::TextureType_Invalid; break; // DX9 unsupported
+    case IRender::BackendAPI::D3D10: textureType = vr::ETextureType::TextureType_DirectX; break;
+    case IRender::BackendAPI::D3D11: textureType = vr::ETextureType::TextureType_DirectX; break;
+    case IRender::BackendAPI::OpenGL: textureType = vr::ETextureType::TextureType_OpenGL; break;
+    }
+
+    vr::Texture_t vrTex = {leftTexture, textureType, vr::EColorSpace::ColorSpace_Auto};
+    vr::VRCompositor()->Submit(vrEye, &vrTex);
 }
 
 void CRenderDevice::DoRender()
@@ -331,25 +380,6 @@ void CRenderDevice::DoRender()
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
-
-    // Openvr present draft
-    auto leftTexture = GEnv.Render->GetRenderTexture();
-    
-    auto gpuApiType = GEnv.Render->GetBackendAPI();
-    vr::ETextureType textureType{};
-
-    switch (gpuApiType)
-    {
-    default:
-    case IRender::BackendAPI::D3D9: textureType = vr::ETextureType::TextureType_Invalid; break; // DX9 unsupported
-    case IRender::BackendAPI::D3D10: textureType = vr::ETextureType::TextureType_DirectX; break;
-    case IRender::BackendAPI::D3D11: textureType = vr::ETextureType::TextureType_DirectX; break;
-    case IRender::BackendAPI::OpenGL: textureType = vr::ETextureType::TextureType_OpenGL; break;
-    }
-
-    vr::Texture_t vrTex = {leftTexture, textureType, vr::EColorSpace::ColorSpace_Auto};
-    vr::VRCompositor()->Submit(vr::EVREye::Eye_Left, &vrTex);
-    vr::VRCompositor()->Submit(vr::EVREye::Eye_Right, &vrTex);
 }
 
 void CRenderDevice::ProcessFrame()
@@ -362,13 +392,23 @@ void CRenderDevice::ProcessFrame()
     GEnv.Render->BeforeFrame();
     FrameMove();
 
-    BeforeRender();
+    //BeforeRender();
 
-    // renderProcessFrame.Set(); // allow render thread to do its job
     syncProcessFrame.Set(); // allow secondary thread to do its job
-    //mtProcessingAllowed = true;
 
+    OpenVr_BeforeRender();
+
+    // Render left eye
+    activeRenderEye = vr::Eye_Left;
     DoRender();
+
+    OpenVr_PresentBufferToVR(vr::Eye_Left);
+
+    // render right eye
+    activeRenderEye = vr::Eye_Right;
+    //DoRender();
+
+    OpenVr_PresentBufferToVR(vr::Eye_Right);
 
     const u64 frameEndTime = TimerGlobal.GetElapsed_ms();
     const u64 frameTime = frameEndTime - frameStartTime;

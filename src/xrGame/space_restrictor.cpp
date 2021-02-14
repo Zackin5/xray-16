@@ -273,7 +273,7 @@ void CSpaceRestrictor::OnRender()
         // DRAW name
 
         Fmatrix res;
-        res.mul(Device.mFullTransform, XFORM());
+        res.mul(Device.mFullTransform[Device.activeRenderEye], XFORM());
 
         Fvector4 v_res;
 

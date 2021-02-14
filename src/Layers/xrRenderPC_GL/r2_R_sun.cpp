@@ -334,7 +334,7 @@ xr_vector<Fbox> s_casters;
 glm::vec2 BuildTSMProjectionMatrix_caster_depth_bounds(glm::mat4& lightSpaceBasis)
 {
     float min_z = 1e32f, max_z = -1e32f;
-    glm::mat4 minmax_xform = glm::make_mat4x4(&Device.mView.m[0][0]) * lightSpaceBasis;
+    glm::mat4 minmax_xform = glm::make_mat4x4(&Device.mView[Device.activeRenderEye].m[0][0]) * lightSpaceBasis;
     for (u32 c = 0; c < s_casters.size(); c++)
     {
         Fvector3 pt;
@@ -360,7 +360,7 @@ void CRender::render_sun()
     {
         float _far_ = std::min(OLES_SUN_LIMIT_27_01_07, g_pGamePersistent->Environment().CurrentEnv->far_plane);
         ex_project = glm::perspective(deg2rad(Device.fFOV), Device.fASPECT, VIEWPORT_NEAR, _far_);
-        ex_full = ex_project * glm::make_mat4x4(&Device.mView.m[0][0]);
+        ex_full = ex_project * glm::make_mat4x4(&Device.mView[Device.activeRenderEye].m[0][0]);
         ex_full_inverse = glm::inverse(ex_full);
     }
 
@@ -476,7 +476,7 @@ void CRender::render_sun()
     set_Recorder(nullptr);
 
     //	Prepare to interact with D3DX code
-    const glm::mat4 m_View = glm::make_mat4x4(&Device.mView.m[0][0]);
+    const glm::mat4 m_View = glm::make_mat4x4(&Device.mView[Device.activeRenderEye].m[0][0]);
     const glm::mat4 m_Projection = ex_project;
     glm::vec3 m_lightDir = -glm::vec3(fuckingsun->direction.x, fuckingsun->direction.y, fuckingsun->direction.z);
 
@@ -739,7 +739,7 @@ void CRender::render_sun()
             //x_project.build_projection	(deg2rad(Device.fFOV),Device.fASPECT,ps_r2_sun_near,ps_r2_sun_near+tweak_guaranteed_range);
             x_project.build_projection(deg2rad(Device.fFOV), Device.fASPECT,VIEWPORT_NEAR,
                                        ps_r2_sun_near + tweak_guaranteed_range);
-            x_full.mul(x_project, Device.mView);
+            x_full.mul(x_project, Device.mView[Device.activeRenderEye]);
             XRMatrixInverse(&x_full_inverse, nullptr, x_full);
         }
         for (int e = 0; e < 8; e++)
@@ -824,8 +824,8 @@ void CRender::render_sun()
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }
 
 void CRender::render_sun_near()
@@ -836,7 +836,7 @@ void CRender::render_sun_near()
     glm::mat4 ex_full_inverse;
     {
         glm::mat4 ex_project = glm::perspective(deg2rad(Device.fFOV), Device.fASPECT,VIEWPORT_NEAR, ps_r2_sun_near);
-        ex_full_inverse = glm::inverse(ex_project * glm::make_mat4x4(&Device.mView.m[0][0]));
+        ex_full_inverse = glm::inverse(ex_project * glm::make_mat4x4(&Device.mView[Device.activeRenderEye].m[0][0]));
     }
 
     // Compute volume(s) - something like a frustum for infinite directional light
@@ -1033,8 +1033,8 @@ void CRender::render_sun_near()
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }
 
 void CRender::render_sun_filtered()
@@ -1091,8 +1091,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // calculate view-frustum bounds in world space
     Fmatrix ex_project, ex_full, ex_full_inverse;
     {
-        ex_project = Device.mProject;
-        ex_full.mul(ex_project, Device.mView);
+        ex_project = Device.mProject[Device.activeRenderEye];
+        ex_full.mul(ex_project, Device.mView[Device.activeRenderEye]);
         XRMatrixInverse(&ex_full_inverse, nullptr, ex_full);
     }
 
@@ -1383,6 +1383,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }

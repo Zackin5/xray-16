@@ -27,7 +27,7 @@ void CRenderTarget::phase_ssao()
 
     // Compute params
     Fmatrix m_v2w;
-    m_v2w.invert(Device.mView);
+    m_v2w.invert(Device.mView[Device.activeRenderEye]);
 
     float fSSAONoise = 2.0f;
     fSSAONoise *= tan(deg2rad(67.5f));
@@ -121,7 +121,7 @@ void CRenderTarget::phase_downsamp()
 
     {
         Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
+        m_v2w.invert(Device.mView[Device.activeRenderEye]);
 
         // Fill VB
         float scale_X = float(w) / float(TEX_jitter);

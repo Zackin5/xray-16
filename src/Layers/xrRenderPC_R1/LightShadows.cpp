@@ -345,8 +345,8 @@ void CLightShadows::calculate()
     // Finita la comedia
     RCache.set_Z(true);
 
-    RCache.set_xform_project(Device.mProject);
-    RCache.set_xform_view(Device.mView);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
 }
 
 #define CLS(a) color_rgba(a, a, a, a)
@@ -419,7 +419,7 @@ void CLightShadows::render()
     int slot_line = rt_size / s_size;
 
     // Projection and xform
-    float _43 = Device.mProject._43;
+    float _43 = Device.mProject[Device.activeRenderEye]._43;
 
     //	Handle biasing problem when near changes
     const float fMinNear = 0.1f;
@@ -429,12 +429,12 @@ void CLightShadows::render()
     float fLerpCoeff = (_43 - fMinNear) / (fMaxNear - fMinNear);
     clamp(fLerpCoeff, 0.0f, 1.0f);
     //	lerp
-    Device.mProject._43 -= fMinNearBias + (fMaxNearBias - fMinNearBias) * fLerpCoeff;
-    // Device.mProject._43			-=	0.0002f;
-    Device.mProject._43 -= 0.002f;
-    // Device.mProject._43			-=	0.0008f;
+    Device.mProject[Device.activeRenderEye]._43 -= fMinNearBias + (fMaxNearBias - fMinNearBias) * fLerpCoeff;
+    // Device.mProject[Device.activeRenderEye]._43			-=	0.0002f;
+    Device.mProject[Device.activeRenderEye]._43 -= 0.002f;
+    // Device.mProject[Device.activeRenderEye]._43			-=	0.0008f;
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
     Fvector View = Device.vCameraPosition;
 
     // Render shadows
@@ -640,6 +640,6 @@ void CLightShadows::render()
     }
 
     // Projection
-    Device.mProject._43 = _43;
-    RCache.set_xform_project(Device.mProject);
+    Device.mProject[Device.activeRenderEye]._43 = _43;
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }

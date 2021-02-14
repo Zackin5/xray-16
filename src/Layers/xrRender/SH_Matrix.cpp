@@ -44,8 +44,12 @@ void CMatrix::Calculate()
         return;
     case modeS_refl:
     {
-        float Ux = .5f * RDEVICE.mView._11, Uy = .5f * RDEVICE.mView._21, Uz = .5f * RDEVICE.mView._31, Uw = .5f;
-        float Vx = -.5f * RDEVICE.mView._12, Vy = -.5f * RDEVICE.mView._22, Vz = -.5f * RDEVICE.mView._32, Vw = .5f;
+        float Ux = .5f * RDEVICE.mView[RDEVICE.activeRenderEye]._11,
+              Uy = .5f * RDEVICE.mView[RDEVICE.activeRenderEye]._21,
+              Uz = .5f * RDEVICE.mView[RDEVICE.activeRenderEye]._31, Uw = .5f;
+        float Vx = -.5f * RDEVICE.mView[RDEVICE.activeRenderEye]._12,
+              Vy = -.5f * RDEVICE.mView[RDEVICE.activeRenderEye]._22,
+              Vz = -.5f * RDEVICE.mView[RDEVICE.activeRenderEye]._32, Vw = .5f;
 
         xform._11 = Ux;
         xform._12 = Vx;
@@ -67,7 +71,7 @@ void CMatrix::Calculate()
         return;
     case modeC_refl:
     {
-        Fmatrix M = RDEVICE.mView;
+        Fmatrix M = RDEVICE.mView[RDEVICE.activeRenderEye];
         M._41 = 0.f;
         M._42 = 0.f;
         M._43 = 0.f;

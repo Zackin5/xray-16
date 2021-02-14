@@ -33,7 +33,7 @@ void CRenderTarget::phase_ssao()
 
     {
         Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
+        m_v2w.invert(Device.mView[Device.activeRenderEye]);
         // Fill VB
         float _w = float(Device.dwWidth);
         float _h = float(Device.dwHeight);
@@ -101,7 +101,7 @@ void CRenderTarget::phase_downsamp()
 
     {
         Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
+        m_v2w.invert(Device.mView[Device.activeRenderEye]);
         // Fill VB
         float _w = float(Device.dwWidth) * 0.5f;
         float _h = float(Device.dwHeight) * 0.5f;

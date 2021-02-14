@@ -69,7 +69,7 @@ void try_change_current_entity()
     g_debug_actor = actor;
 
     CFrustum frustum;
-    frustum.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
+    frustum.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB | FRUSTUM_P_FAR);
 
     typedef xr_vector<ISpatial*> OBJECTS;
     OBJECTS ISpatialResult;
@@ -968,7 +968,7 @@ void CAI_Stalker::dbg_draw_vision()
     shift.set(0.f, 2.5f, 0.f);
 
     Fmatrix res;
-    res.mul(Device.mFullTransform, XFORM());
+    res.mul(Device.mFullTransform[Device.activeRenderEye], XFORM());
 
     Fvector4 v_res;
 

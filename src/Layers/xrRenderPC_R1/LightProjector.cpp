@@ -345,8 +345,8 @@ void CLightProjector::calculate()
     */
 
     // Finita la comedia
-    RCache.set_xform_project(Device.mProject);
-    RCache.set_xform_view(Device.mView);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
 }
 
 #ifdef DEBUG

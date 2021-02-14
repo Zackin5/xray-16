@@ -51,10 +51,10 @@ void CLightR_Manager::render_point  ()
     // return;
 
     // World/View/Projection
-    float _43                    = Device.mProject._43;
-    Device.mProject._43         -= 0.001f;
+    float _43                    = Device.mProject[Device.activeRenderEye]._43;
+    Device.mProject[Device.activeRenderEye]._43         -= 0.001f;
     RCache.set_xform_world      (Fidentity);
-    RCache.set_xform_project    (Device.mProject);
+    RCache.set_xform_project    (Device.mProject[Device.activeRenderEye]);
 
     RImplementation.r1_dlight_light     = selected_point.front();
     RCache.set_Shader                   (hShader);
@@ -138,8 +138,8 @@ void CLightR_Manager::render_point  ()
     }
 
     // Projection
-    Device.mProject._43 = _43;
-    RCache.set_xform_project    (Device.mProject);
+    Device.mProject[Device.activeRenderEye]._43 = _43;
+    RCache.set_xform_project    (Device.mProject[Device.activeRenderEye]);
 }
 */
 

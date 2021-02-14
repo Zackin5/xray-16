@@ -92,10 +92,10 @@ void CRenderTarget::phase_combine()
 
         // (new-camera) -> (world) -> (old_viewproj)
         Fmatrix m_invview;
-        m_invview.invert(Device.mView);
+        m_invview.invert(Device.mView[Device.activeRenderEye]);
         m_previous.mul(m_saved_viewproj, m_invview);
-        m_current.set(Device.mProject);
-        m_saved_viewproj.set(Device.mFullTransform);
+        m_current.set(Device.mProject[Device.activeRenderEye]);
+        m_saved_viewproj.set(Device.mFullTransform[Device.activeRenderEye]);
         float scale = ps_r2_mblur / 2.f;
         m_blur_scale.set(scale, -scale).div(12.f);
     }
@@ -105,7 +105,7 @@ void CRenderTarget::phase_combine()
     {
         // Compute params
         Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
+        m_v2w.invert(Device.mView[Device.activeRenderEye]);
         CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
@@ -156,7 +156,7 @@ void CRenderTarget::phase_combine()
             float L_spec;
             L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
             L_spec = u_diffuse2s(L_clr);
-            Device.mView.transform_dir(L_dir, fuckingsun->direction);
+            Device.mView[Device.activeRenderEye].transform_dir(L_dir, fuckingsun->direction);
             L_dir.normalize();
 
             sunclr.set(L_clr.x, L_clr.y, L_clr.z, L_spec);
@@ -534,7 +534,7 @@ void CRenderTarget::phase_combine_volumetric()
     {
         // Compute params
         Fmatrix m_v2w;
-        m_v2w.invert(Device.mView);
+        m_v2w.invert(Device.mView[Device.activeRenderEye]);
         CEnvDescriptorMixer& envdesc = *g_pGamePersistent->Environment().CurrentEnv;
         const float minamb = 0.001f;
         Fvector4 ambclr =
@@ -577,7 +577,7 @@ void CRenderTarget::phase_combine_volumetric()
             float L_spec;
             L_clr.set(fuckingsun->color.r, fuckingsun->color.g, fuckingsun->color.b);
             L_spec = u_diffuse2s(L_clr);
-            Device.mView.transform_dir(L_dir, fuckingsun->direction);
+            Device.mView[Device.activeRenderEye].transform_dir(L_dir, fuckingsun->direction);
             L_dir.normalize();
 
             sunclr.set(L_clr.x, L_clr.y, L_clr.z, L_spec);

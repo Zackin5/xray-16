@@ -369,16 +369,16 @@ void CWallmarksEngine::Render()
 {
     //	if (marks.empty())			return;
     // Projection and xform
-    float _43 = Device.mProject._43;
-    Device.mProject._43 -= ps_r__WallmarkSHIFT;
+    float _43 = Device.mProject[Device.activeRenderEye]._43;
+    Device.mProject[Device.activeRenderEye]._43 -= ps_r__WallmarkSHIFT;
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 
-    Fmatrix mSavedView = Device.mView;
+    Fmatrix mSavedView = Device.mView[Device.activeRenderEye];
     Fvector mViewPos;
     mViewPos.mad(Device.vCameraPosition, Device.vCameraDirection, ps_r__WallmarkSHIFT_V);
-    Device.mView.build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
-    RCache.set_xform_view(Device.mView);
+    Device.mView[Device.activeRenderEye].build_camera_dir(mViewPos, Device.vCameraDirection, Device.vCameraTop);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
 
     RImplementation.BasicStats.Wallmarks.Begin();
     RImplementation.BasicStats.StaticWMCount = 0;
@@ -493,8 +493,8 @@ void CWallmarksEngine::Render()
     RImplementation.BasicStats.Wallmarks.End();
 
     // Projection
-    Device.mView = mSavedView;
-    Device.mProject._43 = _43;
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    Device.mView[Device.activeRenderEye] = mSavedView;
+    Device.mProject[Device.activeRenderEye]._43 = _43;
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }

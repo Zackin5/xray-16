@@ -156,7 +156,7 @@ class cl_fog_plane : public R_constant_setup
         {
             // Plane
             Fvector4 plane;
-            Fmatrix& M = Device.mFullTransform;
+            Fmatrix& M = Device.mFullTransform[Device.activeRenderEye];
             plane.x = -(M._14 + M._13);
             plane.y = -(M._24 + M._23);
             plane.z = -(M._34 + M._33);
@@ -298,7 +298,7 @@ class cl_sun0_dir_e : public R_constant_setup
         {
             Fvector D;
             CEnvDescriptor& desc = *g_pGamePersistent->Environment().CurrentEnv;
-            Device.mView.transform_dir(D, desc.sun_dir);
+            Device.mView[Device.activeRenderEye].transform_dir(D, desc.sun_dir);
             D.normalize();
             result.set(D.x, D.y, D.z, 0);
         }

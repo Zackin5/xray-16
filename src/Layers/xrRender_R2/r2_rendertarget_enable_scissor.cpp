@@ -34,7 +34,7 @@ void CRenderTarget::enable_dbt_bounds(light* L)
     {
         Fvector pt;
         BB.getpoint(i, pt);
-        Device.mFullTransform.transform(pt);
+        Device.mFullTransform[Device.activeRenderEye].transform(pt);
         bbp.modify(pt);
     }
     u_DBT_enable(bbp.vMin.z, bbp.vMax.z);
@@ -74,7 +74,7 @@ bool CRenderTarget::enable_scissor(light* L) // true if intersects near plane
     // Near plane intersection
     bool near_intersect = false;
     {
-        Fmatrix& M = Device.mFullTransform;
+        Fmatrix& M = Device.mFullTransform[Device.activeRenderEye];
         Fvector4 plane;
         plane.x = -(M._14 + M._13);
         plane.y = -(M._24 + M._23);

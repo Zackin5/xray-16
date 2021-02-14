@@ -135,3 +135,23 @@ void Matrix44ToFmatrix(const vr::HmdMatrix44_t in, Fmatrix out)
     out.m[3][2] = in.m[3][2];
     out.m[3][3] = in.m[3][3];
 }
+
+void InvMatrix44ToFmatrix(const vr::HmdMatrix44_t in, Fmatrix out)
+{ 
+    out.m[0][0] = in.m[0][0];
+    out.m[0][1] = in.m[1][0];
+    out.m[0][2] = in.m[2][0];
+    out.m[0][3] = in.m[3][0];
+    out.m[1][0] = in.m[0][1];
+    out.m[1][1] = in.m[1][1];
+    out.m[1][2] = in.m[2][1];
+    out.m[1][3] = in.m[3][1];
+    out.m[2][0] = in.m[0][2];
+    out.m[2][1] = in.m[1][2];
+    out.m[2][2] = in.m[2][2];
+    out.m[2][3] = in.m[3][2];
+    out.m[3][0] = in.m[0][3];
+    out.m[3][1] = in.m[1][3];
+    out.m[3][2] = in.m[2][3];
+    out.m[3][3] = in.m[3][3];
+}

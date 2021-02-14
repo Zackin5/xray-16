@@ -15,13 +15,13 @@ void CRenderTarget::accum_point(light* L)
     if (L->flags.bHudMode)
     {
         extern ENGINE_API float psHUD_FOV;
-        Pold = Device.mProject;
-        FTold = Device.mFullTransform;
-        Device.mProject.build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+        Pold = Device.mProject[Device.activeRenderEye];
+        FTold = Device.mFullTransform[Device.activeRenderEye];
+        Device.mProject[Device.activeRenderEye].build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
             VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
-        Device.mFullTransform.mul(Device.mProject, Device.mView);
-        RCache.set_xform_project(Device.mProject);
+        Device.mFullTransform[Device.activeRenderEye].mul(Device.mProject[Device.activeRenderEye], Device.mView[Device.activeRenderEye]);
+        RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
         RImplementation.rmNear();
     }
 
@@ -33,13 +33,13 @@ void CRenderTarget::accum_point(light* L)
     Fvector L_clr;
     L_clr.set(L->color.r, L->color.g, L->color.b);
     L_spec = u_diffuse2s(L_clr);
-    Device.mView.transform_tiny(L_pos, L->position);
+    Device.mView[Device.activeRenderEye].transform_tiny(L_pos, L->position);
 
     // Xforms
     L->xform_calc();
     RCache.set_xform_world(L->m_xform);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
     enable_scissor(L);
     enable_dbt_bounds(L);
 
@@ -149,8 +149,8 @@ void CRenderTarget::accum_point(light* L)
     {
         RImplementation.rmNormal();
         // Restore projection
-        Device.mProject = Pold;
-        Device.mFullTransform = FTold;
-        RCache.set_xform_project(Device.mProject);
+        Device.mProject[Device.activeRenderEye] = Pold;
+        Device.mFullTransform[Device.activeRenderEye] = FTold;
+        RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
     }
 }

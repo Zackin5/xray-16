@@ -260,7 +260,7 @@ void CRender::Render()
     // Msg						("sstatic: %s, sun: %s",o.sunstatic?;"true":"false", bSUN?"true":"false");
 
     // HOM
-    ViewBase.CreateFromMatrix(Device.mFullTransform, FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
+    ViewBase.CreateFromMatrix(Device.mFullTransform[Device.activeRenderEye], FRUSTUM_P_LRTB + FRUSTUM_P_FAR);
     if (!ps_r2_ls_flags.test(R2FLAG_EXP_MT_CALC))
     {
         HOM.Enable();
@@ -278,7 +278,7 @@ void CRender::Render()
             deg2rad(Device.fFOV/* *Device.fASPECT*/),
             Device.fASPECT, VIEWPORT_NEAR,
             z_distance * g_pGamePersistent->Environment().CurrentEnv->far_plane);
-        m_zfill.mul(m_project, Device.mView);
+        m_zfill.mul(m_project, Device.mView[Device.activeRenderEye]);
         r_pmask(true, false); // enable priority "0"
         set_Recorder(nullptr);
         phase = PHASE_SMAP;
@@ -315,7 +315,7 @@ void CRender::Render()
     else
         set_Recorder(nullptr);
     phase = PHASE_NORMAL;
-    render_main(Device.mFullTransform, true);
+    render_main(Device.mFullTransform[Device.activeRenderEye], true);
     set_Recorder(nullptr);
     r_pmask(true, false); // disable priority "1"
     BasicStats.Culling.End();
@@ -511,8 +511,8 @@ void CRender::Render()
         PIX_EVENT(DEFER_SELF_ILLUM);
         Target->phase_accumulator();
         // Render emissive geometry, stencil - write 0x0 at pixel pos
-        RCache.set_xform_project(Device.mProject);
-        RCache.set_xform_view(Device.mView);
+        RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
+        RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
         // Stencil - write 0x1 at pixel pos -
 #ifdef USE_DX9
         RCache.set_Stencil(TRUE, D3DCMP_ALWAYS, 0x01, 0xff, 0xff,
@@ -568,7 +568,7 @@ void CRender::render_forward()
         // level
         r_pmask(false, true); // enable priority "1"
         phase = PHASE_NORMAL;
-        render_main(Device.mFullTransform, false); //
+        render_main(Device.mFullTransform[Device.activeRenderEye], false); //
         //	Igor: we don't want to render old lods on next frame.
         mapLOD.clear();
         r_dsgraph_render_graph(1); // normal level, secondary priority

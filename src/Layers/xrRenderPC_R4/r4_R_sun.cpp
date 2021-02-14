@@ -298,7 +298,7 @@ D3DXVECTOR2 BuildTSMProjectionMatrix_caster_depth_bounds(D3DXMATRIX& lightSpaceB
 {
     float min_z = 1e32f, max_z = -1e32f;
     D3DXMATRIX minmax_xf;
-    D3DXMatrixMultiply(&minmax_xf, (D3DXMATRIX*)&Device.mView, &lightSpaceBasis);
+    D3DXMatrixMultiply(&minmax_xf, (D3DXMATRIX*)&Device.mView[Device.activeRenderEye], &lightSpaceBasis);
     Fmatrix& minmax_xform = *((Fmatrix*)&minmax_xf);
     for (u32 c = 0; c < s_casters.size(); c++)
     {
@@ -327,7 +327,7 @@ void CRender::render_sun()
         // ex_project.build_projection	(deg2rad(Device.fFOV/* *Device.fASPECT*/),Device.fASPECT,ps_r2_sun_near,_far_);
         ex_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, _far_);
         // VIEWPORT_NEAR
-        ex_full.mul(ex_project, Device.mView);
+        ex_full.mul(ex_project, Device.mView[Device.activeRenderEye]);
         D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
     }
 
@@ -446,7 +446,7 @@ void CRender::render_sun()
     set_Recorder(NULL);
 
     //	Prepare to interact with D3DX code
-    const D3DXMATRIX& m_View = *((D3DXMATRIX*)(&Device.mView));
+    const D3DXMATRIX& m_View = *((D3DXMATRIX*)(&Device.mView[Device.activeRenderEye]));
     const D3DXMATRIX& m_Projection = *((D3DXMATRIX*)(&ex_project));
     const D3DXVECTOR3 m_lightDir =
         -D3DXVECTOR3(fuckingsun->direction.x, fuckingsun->direction.y, fuckingsun->direction.z);
@@ -694,7 +694,7 @@ void CRender::render_sun()
             // *Device.fASPECT*/),Device.fASPECT,ps_r2_sun_near,ps_r2_sun_near+tweak_guaranteed_range);
             x_project.build_projection(deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR,
                 ps_r2_sun_near + tweak_guaranteed_range);
-            x_full.mul(x_project, Device.mView);
+            x_full.mul(x_project, Device.mView[Device.activeRenderEye]);
             D3DXMatrixInverse((D3DXMATRIX*)&x_full_inverse, 0, (D3DXMATRIX*)&x_full);
         }
         for (int e = 0; e < 8; e++)
@@ -792,8 +792,8 @@ void CRender::render_sun()
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }
 
 void CRender::render_sun_near()
@@ -806,7 +806,7 @@ void CRender::render_sun_near()
     {
         ex_project.build_projection(
             deg2rad(Device.fFOV /* *Device.fASPECT*/), Device.fASPECT, VIEWPORT_NEAR, ps_r2_sun_near);
-        ex_full.mul(ex_project, Device.mView);
+        ex_full.mul(ex_project, Device.mView[Device.activeRenderEye]);
         D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
     }
 
@@ -1036,8 +1036,8 @@ void CRender::render_sun_near()
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }
 
 void CRender::render_sun_filtered()
@@ -1095,8 +1095,8 @@ void CRender::render_sun_cascade(u32 cascade_ind)
     // calculate view-frustum bounds in world space
     Fmatrix ex_project, ex_full, ex_full_inverse;
     {
-        ex_project = Device.mProject;
-        ex_full.mul(ex_project, Device.mView);
+        ex_project = Device.mProject[Device.activeRenderEye];
+        ex_full.mul(ex_project, Device.mView[Device.activeRenderEye]);
         D3DXMatrixInverse((D3DXMATRIX*)&ex_full_inverse, 0, (D3DXMATRIX*)&ex_full);
     }
 
@@ -1381,6 +1381,6 @@ void CRender::render_sun_cascade(u32 cascade_ind)
 
     // Restore XForms
     RCache.set_xform_world(Fidentity);
-    RCache.set_xform_view(Device.mView);
-    RCache.set_xform_project(Device.mProject);
+    RCache.set_xform_view(Device.mView[Device.activeRenderEye]);
+    RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
 }

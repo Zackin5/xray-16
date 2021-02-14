@@ -1531,8 +1531,8 @@ void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
     v1.add(T);
 
     Fvector v0r, v1r;
-    Device.mFullTransform.transform(v0r, v0);
-    Device.mFullTransform.transform(v1r, v1);
+    Device.mFullTransform[Device.activeRenderEye].transform(v0r, v0);
+    Device.mFullTransform[Device.activeRenderEye].transform(v1r, v1);
     float size = v1r.distance_to(v0r);
     CGameFont* pFont = UI().Font().pFontArial14;
     if (!pFont)
@@ -1551,7 +1551,7 @@ void CActor::RenderText(LPCSTR Text, Fvector dpos, float* pdup, u32 color)
     M.c.y += dpos.y;
 
     Fvector4 v_res;
-    Device.mFullTransform.transform(v_res, M.c);
+    Device.mFullTransform[Device.activeRenderEye].transform(v_res, M.c);
 
     if (v_res.z < 0 || v_res.w < 0)
         return;
