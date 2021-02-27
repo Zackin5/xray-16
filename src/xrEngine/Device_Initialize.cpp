@@ -77,6 +77,8 @@ void CRenderDevice::Initialize()
 
         vr::EVRInitError vrError = vr::VRInitError_None;
         openVr = vr::VR_Init(&vrError, vr::VRApplication_Scene);
+
+        VERIFY(vrError == vr::VRInitError_None);
     }
 }
 

@@ -5,6 +5,8 @@
 #include "SDL.h"
 #include "SDL_syswm.h"
 
+#include "openvr\openvr.h"  // TODO: proper OpenVR external include
+
 #if !defined(_MAYA_EXPORT)
 #include "Layers/xrRender/stats_manager.h"
 #endif

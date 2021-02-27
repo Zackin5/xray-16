@@ -368,6 +368,7 @@ void CRenderDevice::DoRender()
     CStatTimer renderTotalReal;
     renderTotalReal.FrameStart();
     renderTotalReal.Begin();
+
     if (b_is_Active && RenderBegin())
     {
         // all rendering is done here
@@ -377,6 +378,7 @@ void CRenderDevice::DoRender()
         Statistic->Show();
         RenderEnd(); // Present goes here
     }
+
     renderTotalReal.End();
     renderTotalReal.FrameEnd();
     stats.RenderTotal.accum = renderTotalReal.accum;
@@ -393,20 +395,19 @@ void CRenderDevice::ProcessFrame()
     FrameMove();
 
     //BeforeRender();
+    OpenVr_BeforeRender();
 
     syncProcessFrame.Set(); // allow secondary thread to do its job
-
-    OpenVr_BeforeRender();
 
     // Render left eye
     activeRenderEye = vr::Eye_Left;
     DoRender();
-
+        
     OpenVr_PresentBufferToVR(vr::Eye_Left);
 
     // render right eye
     activeRenderEye = vr::Eye_Right;
-    //DoRender();
+    DoRender();
 
     OpenVr_PresentBufferToVR(vr::Eye_Right);
 

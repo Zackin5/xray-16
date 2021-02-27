@@ -439,9 +439,21 @@ std::pair<u32, u32> CHW::GetSurfaceSize() const
 
 void CHW::Present()
 {
-    const bool bUseVSync = psDeviceFlags.is(rsFullscreen) &&
-        psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
-    m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+    // TODO: configurable display eye. Defaults to right ATM
+    if (Device.activeRenderEye == 1)
+    {
+        const bool bUseVSync = psDeviceFlags.is(rsFullscreen) &&
+            psDeviceFlags.test(rsVSync); // xxx: weird tearing glitches when VSync turned on for windowed mode in DX10\11
+        m_pSwapChain->Present(bUseVSync ? 1 : 0, 0);
+    }
+
+    // OpenVR present
+    auto eyeTexture = GetRenderTexture();
+    vr::Texture_t vrTex = {eyeTexture, vr::ETextureType::TextureType_DirectX, vr::EColorSpace::ColorSpace_Auto};
+    
+    auto error = vr::VRCompositor()->Submit((vr::EVREye)Device.activeRenderEye, &vrTex);
+    VERIFY(error == vr::VRCompositorError_None);
+
 #ifdef HAS_DX11_2
     if (m_pSwapChain2 && UsingFlipPresentationModel())
     {
