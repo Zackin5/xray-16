@@ -296,10 +296,19 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     auto fNear = 0.2f;
     auto fFar = 100.0f;
     // Get projection matrix
-    auto ovrMatrix = openVr->GetProjectionMatrix(vrEye, fNear, fFar);
-    Matrix44ToFmatrix(ovrMatrix, mProject[vrEye]);
+    auto ovrMatrix = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
+    mProject[vrEye] = ovrMatrix;
     
-    mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop);
+    // Get head position
+    auto headQuat = Matrix34ToQuaternion(hmdTrackedPose.mDeviceToAbsoluteTracking);
+    auto eyePos = Matrix34ToVector(openVr->GetEyeToHeadTransform(vrEye));
+    eyePos = RotateVectorByQuaternion(eyePos, headQuat);
+    
+    // Offset camera position by eye position
+    auto eyeCameraPos = vCameraPosition;
+    eyeCameraPos.add(HmdVectorToFVector(eyePos));
+
+    mView[vrEye].build_camera_dir(eyeCameraPos, vCameraDirection, vCameraTop);
     mProject[vrEye].build_projection(deg2rad(fFOV), fASPECT, fNear, fFar);  // TODO: use OpenVR projection
 
     // Matrices
@@ -307,10 +316,10 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     GEnv.Render->SetCacheXform(mView[vrEye], mProject[vrEye]);
     mInvFullTransform[vrEye].invert_44(mFullTransform[vrEye]);
 
-    vCameraPositionSaved[vrEye] = vCameraPosition[vrEye];
-    vCameraDirectionSaved[vrEye] = vCameraDirection[vrEye];
-    vCameraTopSaved[vrEye] = vCameraTop[vrEye];
-    vCameraRightSaved[vrEye] = vCameraRight[vrEye];
+    vCameraPositionSaved = vCameraPosition;
+    vCameraDirectionSaved = vCameraDirection;
+    vCameraTopSaved = vCameraTop;
+    vCameraRightSaved = vCameraRight;
 
     mFullTransformSaved[vrEye] = mFullTransform[vrEye];
     mViewSaved[vrEye] = mView[vrEye];
