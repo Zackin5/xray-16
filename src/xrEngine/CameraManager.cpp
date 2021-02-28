@@ -316,7 +316,6 @@ void CCameraManager::UpdatePPEffectors()
 
 void CCameraManager::ApplyDevice()
 {
-    // TODO: move OpenVr tracking calculations here??
     // Device params
     //Device.mView[0].build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
 

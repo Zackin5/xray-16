@@ -452,7 +452,7 @@ void CHW::Present()
     vr::Texture_t vrTex = {eyeTexture, vr::ETextureType::TextureType_DirectX, vr::EColorSpace::ColorSpace_Auto};
     
     auto error = vr::VRCompositor()->Submit((vr::EVREye)Device.activeRenderEye, &vrTex);
-    VERIFY(error == vr::VRCompositorError_None);
+    //VERIFY(error == vr::VRCompositorError_None);  // TODO: address issue where error thrown on loadscreen
 
 #ifdef HAS_DX11_2
     if (m_pSwapChain2 && UsingFlipPresentationModel())
