@@ -299,31 +299,6 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     //auto ovrMatrix = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
     mProject[vrEye] = InvMatrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
     
-    // Iteration #1 > quat > eruler maths
-    /*// Get head position
-    auto headQuat = Matrix34ToQuaternion(hmdTrackedPose.mDeviceToAbsoluteTracking);
-    auto eyePos = Matrix34ToVector(openVr->GetEyeToHeadTransform(vrEye));
-    eyePos = RotateVectorByQuaternion(eyePos, headQuat);
-    
-    // Offset camera position by eye position
-    auto eyeCameraPos = vCameraPosition;
-    eyeCameraPos.add(HmdVectorToFVector(eyePos));
-    mView[vrEye].build_camera_dir(eyeCameraPos, vCameraDirection, vCameraTop);*/
-
-    // Iteration #3 source matrix maths
-    /*auto playerMatrix = Fmatrix{};
-    playerMatrix._41 = vCameraPosition.x;
-    playerMatrix._42 = vCameraPosition.y;
-    playerMatrix._43 = vCameraPosition.z;
-    playerMatrix._44 = 1.0f;
-
-    auto headMatrix = Matrix34ToFmatrix(hmdTrackedPose.mDeviceToAbsoluteTracking);
-    auto eyeMatrix = Matrix34ToFmatrix(openVr->GetEyeToHeadTransform(vrEye));
-    Fmatrix trackingMatrix{};
-    trackingMatrix.mul(headMatrix, eyeMatrix);
-    //mView[vrEye].invert(trackingMatrix);
-    mView[vrEye] = trackingMatrix;*/
-
     // Iteration #2 unrolled matrix maths
     auto eyeMatrix = Matrix34ToFmatrix(openVr->GetEyeToHeadTransform(vrEye));
 
@@ -338,13 +313,12 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][1]};
 
     Fvector hmdRight = Fvector{
-        // OVR HMD matrix return left instead of right, invert the vector
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][0],  
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][0], 
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][0]};
 
     Fvector hmdTransaction = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][3],  // OVR HMD matrix return left instead of right, invert the axis
+        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][3],
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][3], 
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][3]};
 
@@ -361,61 +335,18 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     viewMatrix._32 = hmdForward.y;
     viewMatrix._33 = hmdForward.z;
     viewMatrix._34 = 0.0f;
-    /*mView[vrEye]._41 = hmdRight.dotproduct(vCameraPosition.invert());
+    /*mView[vrEye]._41 = -vCameraPosition.dotproduct(hmdRight);
+    mView[vrEye]._42 = -vCameraPosition.dotproduct(hmdUp);
+    mView[vrEye]._43 = -vCameraPosition.dotproduct(hmdForward);*/
+    mView[vrEye]._41 = hmdRight.dotproduct(vCameraPosition.invert());
     mView[vrEye]._42 = hmdUp.dotproduct(vCameraPosition.invert());
-    mView[vrEye]._43 = hmdForward.dotproduct(vCameraPosition.invert());*/
-    viewMatrix._41 = hmdTransaction.x;
+    mView[vrEye]._43 = hmdForward.dotproduct(vCameraPosition.invert());
+    /*viewMatrix._41 = hmdTransaction.x;
     viewMatrix._42 = hmdTransaction.y;
-    viewMatrix._43 = hmdTransaction.z;
+    viewMatrix._43 = hmdTransaction.z;*/
     viewMatrix._44 = 1.0f;
 
     mView[vrEye].invert(viewMatrix);
-    //mView[vrEye].invert_44(viewMatrix);
-
-    // Iteration #4 rip and passthrough
-    /*// Get head position
-    auto headQuat = Matrix34ToQuaternion(hmdTrackedPose.mDeviceToAbsoluteTracking);
-    auto eyePos = Matrix34ToVector(openVr->GetEyeToHeadTransform(vrEye));
-    eyePos = RotateVectorByQuaternion(eyePos, headQuat);
-    
-    // Offset camera position by eye position
-    auto eyeCameraPos = vCameraPosition;
-    eyeCameraPos.add(HmdVectorToFVector(eyePos));
-
-    auto inverseMatrix = Matrix34ToFmatrix(hmdTrackedPose.mDeviceToAbsoluteTracking).invert();
-
-    Fvector hmdForward = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][2],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][2],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][2]
-    };
-
-    //Fvector hmdForward = Fvector{
-    //    inverseMatrix.m[2][0], 
-    //    inverseMatrix.m[2][1], 
-    //    inverseMatrix.m[2][2]
-    //};
-
-    Fvector hmdUp = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][1],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][1], 
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][1]
-    };
-
-    Fvector hmdRight = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][0],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][1], 
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][2]
-    };
-
-    mView[vrEye].build_camera_dir(eyeCameraPos, hmdForward, hmdUp);*/
-
-    // Iter 5
-    /*auto headMatrix = Matrix34ToFmatrix(hmdTrackedPose.mDeviceToAbsoluteTracking);
-    mView[vrEye].build_camera_vr(vCameraPosition, headMatrix);*/
-    
-
-    //mProject[vrEye].build_projection(deg2rad(fFOV), fASPECT, fNear, fFar);  // TODO: use OpenVR projection
 
     // Matrices
     mFullTransform[vrEye].mul(mProject[vrEye], mView[vrEye]);

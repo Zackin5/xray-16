@@ -416,61 +416,6 @@ struct _matrix
         return *this;
     }
 
-    /*IC SelfRef build_camera_vr(const Tvector& vFrom, const Fmatrix& ovrTracking)
-    {
-        Fvector hmdForward = Fvector{
-            ovrTracking.m[2][0],
-            ovrTracking.m[2][1],
-            ovrTracking.m[2][2]
-        };
-
-        Fvector hmdUp = Fvector{
-            ovrTracking.m[1][0],
-            ovrTracking.m[1][1],
-            ovrTracking.m[1][2]
-        };
-
-        Fvector hmdRight = Fvector{
-            ovrTracking.m[0][0],
-            ovrTracking.m[0][1],
-            ovrTracking.m[0][2]
-        };
-
-        // Get the dot product, and calculate the projection of the z basis
-        // vector3 onto the up vector3. The projection is the y basis vector3.
-        T fDotProduct = vWorldUp.dotproduct(vView);
-
-        Tvector vUp;
-        vUp.mul(vView, -fDotProduct).add(vWorldUp).normalize();
-
-        // The x basis vector3 is found simply with the cross product of the y
-        // and z basis vectors
-        Tvector vRight;
-        vRight.crossproduct(vUp, vView);
-
-        // Start building the Device.mView. The first three rows contains the basis
-        // vectors used to rotate the view to point at the lookat point
-        _11 = vRight.x;
-        _12 = vUp.x;
-        _13 = vView.x;
-        _14 = 0.0f;
-        _21 = vRight.y;
-        _22 = vUp.y;
-        _23 = vView.y;
-        _24 = 0.0f;
-        _31 = vRight.z;
-        _32 = vUp.z;
-        _33 = vView.z;
-        _34 = 0.0f;
-
-        // Do the translation values (rotations are still about the eyepoint)
-        _41 = -vFrom.dotproduct(vRight);
-        _42 = -vFrom.dotproduct(vUp);
-        _43 = -vFrom.dotproduct(vView);
-        _44 = 1.0f;
-        return *this;
-    }*/
-
     IC SelfRef inertion(const Self& mat, T v)
     {
         T iv = 1.f - v;
