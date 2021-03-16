@@ -335,17 +335,9 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     viewMatrix._32 = hmdForward.y;
     viewMatrix._33 = hmdForward.z;
     viewMatrix._34 = 0.0f;
-    /*mView[vrEye]._41 = -vCameraPosition.dotproduct(hmdRight);
-    mView[vrEye]._42 = -vCameraPosition.dotproduct(hmdUp);
-    mView[vrEye]._43 = -vCameraPosition.dotproduct(hmdForward);*/
-    mView[vrEye]._41 = hmdRight.dotproduct(vCameraPosition.invert());
-    mView[vrEye]._42 = hmdUp.dotproduct(vCameraPosition.invert());
-    mView[vrEye]._43 = hmdForward.dotproduct(vCameraPosition.invert());
-    /*viewMatrix._41 = hmdTransaction.x;
-    viewMatrix._42 = hmdTransaction.y;
-    viewMatrix._43 = hmdTransaction.z;*/
     viewMatrix._44 = 1.0f;
 
+    viewMatrix.translate_add(vCameraPosition);
     mView[vrEye].invert(viewMatrix);
 
     // Matrices
@@ -369,7 +361,7 @@ void CRenderDevice::OpenVr_BeforeRender()
     vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
     // Get HMD position
-    vCameraPosition.add(Matrix34ToFVector(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking)); // Add HMD pos to player pos
+    //vCameraPosition.add(Matrix34ToFVector(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking)); // Add HMD pos to player pos
 
     // TODO: get HMD rotation (or: skip position, calculate view matrix directly?)
     auto hmdQuarternion = Matrix34ToQuaternion(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking);
