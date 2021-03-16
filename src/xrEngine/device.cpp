@@ -296,8 +296,7 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     auto fNear = 0.2f;
     auto fFar = 100.0f;
     // Get projection matrix
-    //auto ovrMatrix = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
-    mProject[vrEye] = InvMatrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
+    mProject[vrEye] = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
     
     // Iteration #2 unrolled matrix maths
     auto eyeMatrix = Matrix34ToFmatrix(openVr->GetEyeToHeadTransform(vrEye));
