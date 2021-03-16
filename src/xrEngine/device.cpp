@@ -335,6 +335,9 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     viewMatrix._32 = hmdForward.y;
     viewMatrix._33 = hmdForward.z;
     viewMatrix._34 = 0.0f;
+    viewMatrix._41 = hmdTransaction.x;
+    viewMatrix._42 = hmdTransaction.y;
+    viewMatrix._43 = hmdTransaction.z;
     viewMatrix._44 = 1.0f;
 
     viewMatrix.translate_add(vCameraPosition);
