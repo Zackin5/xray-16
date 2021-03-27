@@ -292,15 +292,23 @@ void CRenderDevice::BeforeRender()
 
 void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose) 
 {
-    // TODO: get proper z near/far values from camera
-    auto fNear = 0.2f;
-    auto fFar = 100.0f;
     // Get projection matrix
-    mProject[vrEye] = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
+    /*auto ovrProjection = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
+    mProject[vrEye].set(ovrProjection);
+    //mProject[vrEye].invert(ovrProjection);*/
+
+    float pfLeft;
+    float pfRight;
+    float pfTop;
+    float pfBottom;
+    openVr->GetProjectionRaw(vrEye, &pfLeft, &pfRight, &pfTop, &pfBottom);
+    auto ovrProjection = ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, fNear, fFar);
+    mProject[vrEye].set(ovrProjection);
     
-    // Iteration #2 unrolled matrix maths
+    // TODO: add eye offset
     auto eyeMatrix = Matrix34ToFmatrix(openVr->GetEyeToHeadTransform(vrEye));
 
+    // Unrolled matrix maths
     Fvector hmdForward = Fvector{
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][2],
         hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][2], 

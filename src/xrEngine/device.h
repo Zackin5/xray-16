@@ -111,6 +111,10 @@ public:
     float fFOV;
     float fASPECT;
 
+    // TODO: this are just copied from CameraManager, find a proper hookup
+    float fNear;
+    float fFar;
+
 protected:
     u32 Timer_MM_Delta;
     CTimer_paused Timer;

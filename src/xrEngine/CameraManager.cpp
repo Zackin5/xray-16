@@ -327,6 +327,8 @@ void CCameraManager::ApplyDevice()
     // projection
     Device.fFOV = m_cam_info.fFov;
     Device.fASPECT = m_cam_info.fAspect;
+    Device.fNear = m_cam_info.fNear;
+    Device.fFar = m_cam_info.fFar;
     //Device.mProject[0].build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
     
     // Apply offset required for Nvidia Ansel

@@ -148,3 +148,32 @@ Fvector HmdVectorToFVector(vr::HmdVector3_t v)
     out.z = v.v[2];
     return out;
 }
+
+Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, float zNear, float zFar)
+{
+    float idx = 1.0f / (fRight - fLeft);
+    float idy = 1.0f / (fBottom - fTop);
+    float idz = 1.0f / (zFar - zNear);
+    float sx = fRight + fLeft;
+    float sy = fBottom + fTop;
+
+    Fmatrix p{};
+    p.m[0][0] = 2 * idx;
+    p.m[1][0] = 0;
+    p.m[2][0] = sx * idx;
+    p.m[3][0] = 0;
+    p.m[0][1] = 0;
+    p.m[1][1] = 2 * idy;
+    p.m[2][1] = sy * idy;
+    p.m[3][1] = 0;
+    p.m[0][2] = 0;
+    p.m[1][2] = 0;
+    p.m[2][2] = -zFar * idz;
+    p.m[3][2] = -zFar * zNear * idz;
+    p.m[0][3] = 0;
+    p.m[1][3] = 0;
+    p.m[2][3] = -1.0f;
+    p.m[3][3] = 0;
+
+    return p;
+}
