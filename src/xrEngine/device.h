@@ -108,6 +108,7 @@ public:
     Fmatrix mProjectSaved[2];
     Fmatrix mFullTransformSaved[2];
 
+    float vrZoom = 1.f;
     float fFOV;
     float fASPECT;
 

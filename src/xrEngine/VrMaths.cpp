@@ -149,31 +149,32 @@ Fvector HmdVectorToFVector(vr::HmdVector3_t v)
     return out;
 }
 
-Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, float zNear, float zFar)
+Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, float zNear, float zFar, float zoomMult)
 {
-    float idx = 1.0f / (fRight - fLeft);
-    float idy = 1.0f / (fBottom - fTop);
+    float idx = 1.0f / (zoomMult * (fRight - fLeft));
+    float idy = 1.0f / (zoomMult * (fBottom - fTop));
     float idz = 1.0f / (zFar - zNear);
-    float sx = fRight + fLeft;
-    float sy = fBottom + fTop;
+    float sx = zoomMult * (fRight + fLeft);
+    float sy = zoomMult * (fBottom + fTop);
+    float Q = zFar / (zFar - zNear);
 
     Fmatrix p{};
-    p.m[0][0] = 2 * idx;
-    p.m[1][0] = 0;
-    p.m[2][0] = sx * idx;
-    p.m[3][0] = 0;
-    p.m[0][1] = 0;
-    p.m[1][1] = 2 * idy;
-    p.m[2][1] = sy * idy;
-    p.m[3][1] = 0;
-    p.m[0][2] = 0;
-    p.m[1][2] = 0;
-    p.m[2][2] = -zFar * idz;
-    p.m[3][2] = -zFar * zNear * idz;
-    p.m[0][3] = 0;
-    p.m[1][3] = 0;
-    p.m[2][3] = -1.0f;
-    p.m[3][3] = 0;
+    p._11 = 2 * idx;
+    p._12 = 0;
+    p._13 = 0;
+    p._14 = 0;
+    p._21 = 0;
+    p._22 = 2 * idy;
+    p._23 = 0;
+    p._24 = 0;
+    p._31 = sx * idx;
+    p._32 = sy * idy;
+    p._33 = Q;
+    p._34 = 1.0f;
+    p._41 = 0;
+    p._42 = 0;
+    p._43 = -Q * zNear;
+    p._44 = 0;
 
     return p;
 }

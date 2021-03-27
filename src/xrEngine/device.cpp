@@ -302,7 +302,7 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     float pfTop;
     float pfBottom;
     openVr->GetProjectionRaw(vrEye, &pfLeft, &pfRight, &pfTop, &pfBottom);
-    auto ovrProjection = ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, fNear, fFar);
+    auto ovrProjection = ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, fNear, fFar, vrZoom);
     mProject[vrEye].set(ovrProjection);
     
     // TODO: add eye offset
@@ -349,6 +349,7 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
 
     viewMatrix.translate_add(vCameraPosition);
     mView[vrEye].invert(viewMatrix);
+    //mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop); // Interim revert for projection matrix testing
 
     // Matrices
     mFullTransform[vrEye].mul(mProject[vrEye], mView[vrEye]);
