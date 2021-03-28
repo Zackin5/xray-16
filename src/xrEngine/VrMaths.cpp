@@ -36,15 +36,15 @@ Fmatrix Matrix34ToFmatrix(vr::HmdMatrix34_t in)
     Fmatrix out{};
     
     out._11 = in.m[0][0];
-    out._12 = in.m[0][1];
-    out._13 = in.m[0][2];
+    out._12 = in.m[1][0];
+    out._13 = in.m[2][0];
     out._14 = 0.0f;
-    out._21 = in.m[1][0];
+    out._21 = in.m[0][1];
     out._22 = in.m[1][1];
-    out._23 = in.m[1][2];
+    out._23 = in.m[2][1];
     out._24 = 0.0f;
-    out._31 = in.m[2][0];
-    out._32 = in.m[2][1];
+    out._31 = in.m[0][2];
+    out._32 = in.m[1][2];
     out._33 = in.m[2][2];
     out._34 = 0.0f;
     out._41 = in.m[0][3];
@@ -52,6 +52,29 @@ Fmatrix Matrix34ToFmatrix(vr::HmdMatrix34_t in)
     out._43 = in.m[2][3];
     out._44 = 1.0f;
 
+    return out;
+}
+
+// Converts a HMD 4x4 matrix to a xray 4x4 matrix
+Fmatrix Matrix44ToFmatrix(const vr::HmdMatrix44_t in)
+{
+    Fmatrix out{};
+    out._11 = in.m[0][0];
+    out._12 = in.m[1][0];
+    out._13 = in.m[2][0];
+    out._14 = in.m[3][0];
+    out._21 = in.m[0][1];
+    out._22 = in.m[1][1];
+    out._23 = in.m[2][1];
+    out._24 = in.m[3][1];
+    out._31 = in.m[0][2];
+    out._32 = in.m[1][2];
+    out._33 = in.m[2][2];
+    out._34 = in.m[3][2];
+    out._41 = in.m[0][3];
+    out._42 = in.m[1][3];
+    out._43 = in.m[2][3];
+    out._44 = in.m[3][3];
     return out;
 }
 
@@ -116,29 +139,6 @@ Fvector QuaternionToYawPitchRoll(const vr::HmdQuaternion_t q)
     return out;
 }
 
-// Converts a HMD 4x4 matrix to a xray 4x4 matrix
-Fmatrix Matrix44ToFmatrix(const vr::HmdMatrix44_t in)
-{ 
-    Fmatrix out{};
-    out.m[0][0] = in.m[0][0];
-    out.m[0][1] = in.m[1][0];
-    out.m[0][2] = in.m[2][0];
-    out.m[0][3] = in.m[3][0];
-    out.m[1][0] = in.m[0][1];
-    out.m[1][1] = in.m[1][1];
-    out.m[1][2] = in.m[2][1];
-    out.m[1][3] = in.m[3][1];
-    out.m[2][0] = in.m[0][2];
-    out.m[2][1] = in.m[1][2];
-    out.m[2][2] = in.m[2][2];
-    out.m[2][3] = in.m[3][2];
-    out.m[3][0] = in.m[0][3];
-    out.m[3][1] = in.m[1][3];
-    out.m[3][2] = in.m[2][3];
-    out.m[3][3] = in.m[3][3];
-    return out;
-}
-
 // OpenVR units to XRay
 Fvector HmdVectorToFVector(vr::HmdVector3_t v) 
 { 
@@ -152,10 +152,10 @@ Fvector HmdVectorToFVector(vr::HmdVector3_t v)
 Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose) 
 {
     // TODO: add eye offset
-    Fvector hmdForward = Fvector{
-        devicePose.m[0][2], 
-        devicePose.m[1][2], 
-        devicePose.m[2][2]};
+    Fvector hmdForward = Fvector{   // OVR uses RH coordinates, flip to XRay LH
+        -devicePose.m[0][2], 
+        -devicePose.m[1][2], 
+        -devicePose.m[2][2]};
 
     Fvector hmdUp = Fvector{
         devicePose.m[0][1], 
@@ -173,7 +173,7 @@ Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose)
         devicePose.m[2][3]};
 
     Fmatrix viewMatrix{};
-    viewMatrix._11 = hmdRight.x;
+    /*viewMatrix._11 = hmdRight.x;
     viewMatrix._12 = hmdRight.y;
     viewMatrix._13 = hmdRight.z;
     viewMatrix._14 = 0.0f;
@@ -188,7 +188,13 @@ Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose)
     viewMatrix._41 = hmdTransaction.x;
     viewMatrix._42 = hmdTransaction.y;
     viewMatrix._43 = hmdTransaction.z;
-    viewMatrix._44 = 1.0f;
+    viewMatrix._44 = 1.0f;*/
+
+    /*viewMatrix._11 = hmdRight.x;    viewMatrix._12 = hmdUp.x;    viewMatrix._13 = hmdForward.x;    viewMatrix._14 = 0.0f;
+    viewMatrix._21 = hmdRight.y;    viewMatrix._22 = hmdUp.y;    viewMatrix._23 = hmdForward.y;    viewMatrix._24 = 0.0f;
+    viewMatrix._31 = hmdRight.z;    viewMatrix._32 = hmdUp.z;    viewMatrix._33 = hmdForward.z;    viewMatrix._34 = 0.0f;
+    //viewMatrix._41 = hmdTransaction.x;    viewMatrix._42 = hmdTransaction.y;    viewMatrix._43 = hmdTransaction.z;    viewMatrix._44 = 1.0f;
+    viewMatrix._41 = 0.0;    viewMatrix._42 = 0.0;    viewMatrix._43 = 0.0;    viewMatrix._44 = 1.0f;*/
 
     return viewMatrix;
 }
@@ -255,5 +261,24 @@ Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, 
     p._43 = -zNear * zDelta; // E
     p._44 = 0;*/
 
-    return p;
+    Fmatrix mirrorMatrix{};
+    mirrorMatrix._11 = 1.0f;
+    mirrorMatrix._12 = 0.0f;
+    mirrorMatrix._13 = 0.0f;
+    mirrorMatrix._14 = 0.0f;
+    mirrorMatrix._21 = 0.0f;
+    mirrorMatrix._22 = 1.0f;
+    mirrorMatrix._23 = 0.0f;
+    mirrorMatrix._24 = 0.0f;
+    mirrorMatrix._31 = 0.0f;
+    mirrorMatrix._32 = 0.0f;
+    mirrorMatrix._33 = -1.0f;
+    mirrorMatrix._34 = 0.0f;
+    mirrorMatrix._41 = 0.0f;
+    mirrorMatrix._42 = 0.0f;
+    mirrorMatrix._43 = 0.0f;
+    mirrorMatrix._44 = 1.0f;
+
+    return p.mul(p, mirrorMatrix);
+    //return p;
 }

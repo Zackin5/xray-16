@@ -292,20 +292,67 @@ void CRenderDevice::BeforeRender()
 
 void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose) 
 {
-    // Get projection matrix
-    float pfLeft;
+    // Get projection matrix (built from raw projection)
+    /*float pfLeft;
     float pfRight;
     float pfTop;
     float pfBottom;
     openVr->GetProjectionRaw(vrEye, &pfLeft, &pfRight, &pfTop, &pfBottom);
     auto ovrProjection = ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, fNear, fFar, vrZoom);
+    mProject[vrEye].set(ovrProjection);*/
+
+    // Get projection matrix (converted and multipled)
+    Fmatrix mirrorMatrix{};
+    mirrorMatrix._11 = 1.0f;
+    mirrorMatrix._12 = 0.0f;
+    mirrorMatrix._13 = 0.0f;
+    mirrorMatrix._14 = 0.0f;
+    mirrorMatrix._21 = 0.0f;
+    mirrorMatrix._22 = 1.0f;
+    mirrorMatrix._23 = 0.0f;
+    mirrorMatrix._24 = 0.0f;
+    mirrorMatrix._31 = 0.0f;
+    mirrorMatrix._32 = 0.0f;
+    mirrorMatrix._33 = -1.0f;
+    mirrorMatrix._34 = 0.0f;
+    mirrorMatrix._41 = 0.0f;
+    mirrorMatrix._42 = 0.0f;
+    mirrorMatrix._43 = 0.0f;
+    mirrorMatrix._44 = 1.0f;
+
+    auto ovrProjection = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
+    //mProject[vrEye].mul(ovrProjection, mirrorMatrix);
     mProject[vrEye].set(ovrProjection);
     
-    // Get view matrix
-    auto viewMatrix = ComposeView(hmdTrackedPose.mDeviceToAbsoluteTracking, openVr->GetEyeToHeadTransform(vrEye));
+    // Get view matrix (built from matrix values)
+    /*auto viewMatrix = ComposeView(hmdTrackedPose.mDeviceToAbsoluteTracking, openVr->GetEyeToHeadTransform(vrEye));
+    viewMatrix.translate_add(vCameraPosition);
+    mView[vrEye].invert(viewMatrix);*/
+    //mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop); // Interim revert for projection matrix testing
+
+    // Get view matrix (converted and multipled)
+    Fmatrix vmMirrorMatrix{};
+    vmMirrorMatrix._11 = 1.0f;
+    vmMirrorMatrix._12 = 0.0f;
+    vmMirrorMatrix._13 = 0.0f;
+    vmMirrorMatrix._14 = 0.0f;
+    vmMirrorMatrix._21 = 0.0f;
+    vmMirrorMatrix._22 = 1.0f;
+    vmMirrorMatrix._23 = 0.0f;
+    vmMirrorMatrix._24 = 0.0f;
+    vmMirrorMatrix._31 = 0.0f;
+    vmMirrorMatrix._32 = 0.0f;
+    vmMirrorMatrix._33 = -1.0f;
+    vmMirrorMatrix._34 = 0.0f;
+    vmMirrorMatrix._41 = 0.0f;
+    vmMirrorMatrix._42 = 0.0f;
+    vmMirrorMatrix._43 = 0.0f;
+    vmMirrorMatrix._44 = 1.0f;
+
+    auto viewMatrix = Matrix34ToFmatrix(hmdTrackedPose.mDeviceToAbsoluteTracking);
+    viewMatrix = viewMatrix.mul(viewMatrix, vmMirrorMatrix);
     viewMatrix.translate_add(vCameraPosition);
     mView[vrEye].invert(viewMatrix);
-    //mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop); // Interim revert for projection matrix testing
 
     // Matrices
     mFullTransform[vrEye].mul(mProject[vrEye], mView[vrEye]);
