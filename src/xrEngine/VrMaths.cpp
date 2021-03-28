@@ -149,6 +149,50 @@ Fvector HmdVectorToFVector(vr::HmdVector3_t v)
     return out;
 }
 
+Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose) 
+{
+    // TODO: add eye offset
+    Fvector hmdForward = Fvector{
+        devicePose.m[0][2], 
+        devicePose.m[1][2], 
+        devicePose.m[2][2]};
+
+    Fvector hmdUp = Fvector{
+        devicePose.m[0][1], 
+        devicePose.m[1][1], 
+        devicePose.m[2][1]};
+
+    Fvector hmdRight = Fvector{
+        devicePose.m[0][0], 
+        devicePose.m[1][0], 
+        devicePose.m[2][0]};
+
+    Fvector hmdTransaction = Fvector{
+        devicePose.m[0][3], 
+        devicePose.m[1][3], 
+        devicePose.m[2][3]};
+
+    Fmatrix viewMatrix{};
+    viewMatrix._11 = hmdRight.x;
+    viewMatrix._12 = hmdRight.y;
+    viewMatrix._13 = hmdRight.z;
+    viewMatrix._14 = 0.0f;
+    viewMatrix._21 = hmdUp.x;
+    viewMatrix._22 = hmdUp.y;
+    viewMatrix._23 = hmdUp.z;
+    viewMatrix._24 = 0.0f;
+    viewMatrix._31 = hmdForward.x;
+    viewMatrix._32 = hmdForward.y;
+    viewMatrix._33 = hmdForward.z;
+    viewMatrix._34 = 0.0f;
+    viewMatrix._41 = hmdTransaction.x;
+    viewMatrix._42 = hmdTransaction.y;
+    viewMatrix._43 = hmdTransaction.z;
+    viewMatrix._44 = 1.0f;
+
+    return viewMatrix;
+}
+
 Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, float zNear, float zFar, float zoomMult)
 {
     float idx = 1.0f / (zoomMult * (fRight - fLeft));
@@ -156,10 +200,10 @@ Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, 
     float idz = 1.0f / (zFar - zNear);
     float sx = zoomMult * (fRight + fLeft);
     float sy = zoomMult * (fBottom + fTop);
-    float Q = zFar / (zFar - zNear);
+    //float Q = zFar / (zFar - zNear);
 
     Fmatrix p{};
-    p._11 = 2 * idx;
+    /*p._11 = 2 * idx;
     p._12 = 0;
     p._13 = 0;
     p._14 = 0;
@@ -174,7 +218,42 @@ Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, 
     p._41 = 0;
     p._42 = 0;
     p._43 = -Q * zNear;
+    p._44 = 0;*/
+
+    p._11 = 2 * idx;
+    p._21 = 0;
+    p._31 = sx * idx;
+    p._41 = 0;
+    p._12 = 0;
+    p._22 = 2 * idy;
+    p._32 = sy * idy;
+    p._42 = 0;
+    p._13 = 0;
+    p._23 = 0;
+    p._33 = -zFar * idz;
+    p._43 = -zFar * zNear * idz;
+    p._14 = 0;
+    p._24 = 0;
+    p._34 = -1.0f;
     p._44 = 0;
+
+    /*float zDelta = zFar * idz;
+    p._11 = 2 * idx;
+    p._12 = 0;
+    p._13 = 0;
+    p._14 = 0;
+    p._21 = 0;
+    p._22 = 2 * idy;
+    p._23 = 0;
+    p._24 = 0;
+    p._31 = sx * idx;
+    p._32 = sy * idy;
+    p._33 = zDelta; // C
+    p._34 = 1.0f;   // D
+    p._41 = 0;
+    p._42 = 0;
+    p._43 = -zNear * zDelta; // E
+    p._44 = 0;*/
 
     return p;
 }

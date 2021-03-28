@@ -293,10 +293,6 @@ void CRenderDevice::BeforeRender()
 void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose) 
 {
     // Get projection matrix
-    /*auto ovrProjection = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
-    mProject[vrEye].set(ovrProjection);
-    //mProject[vrEye].invert(ovrProjection);*/
-
     float pfLeft;
     float pfRight;
     float pfTop;
@@ -305,48 +301,8 @@ void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose
     auto ovrProjection = ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, fNear, fFar, vrZoom);
     mProject[vrEye].set(ovrProjection);
     
-    // TODO: add eye offset
-    auto eyeMatrix = Matrix34ToFmatrix(openVr->GetEyeToHeadTransform(vrEye));
-
-    // Unrolled matrix maths
-    Fvector hmdForward = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][2],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][2], 
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][2]};
-
-    Fvector hmdUp = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][1],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][1], 
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][1]};
-
-    Fvector hmdRight = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][0],  
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][0], 
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][0]};
-
-    Fvector hmdTransaction = Fvector{
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[0][3],
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[1][3], 
-        hmdTrackedPose.mDeviceToAbsoluteTracking.m[2][3]};
-
-    Fmatrix viewMatrix{};
-    viewMatrix._11 = hmdRight.x;
-    viewMatrix._12 = hmdRight.y;
-    viewMatrix._13 = hmdRight.z;
-    viewMatrix._14 = 0.0f;
-    viewMatrix._21 = hmdUp.x;
-    viewMatrix._22 = hmdUp.y;
-    viewMatrix._23 = hmdUp.z;
-    viewMatrix._24 = 0.0f;
-    viewMatrix._31 = hmdForward.x;
-    viewMatrix._32 = hmdForward.y;
-    viewMatrix._33 = hmdForward.z;
-    viewMatrix._34 = 0.0f;
-    viewMatrix._41 = hmdTransaction.x;
-    viewMatrix._42 = hmdTransaction.y;
-    viewMatrix._43 = hmdTransaction.z;
-    viewMatrix._44 = 1.0f;
-
+    // Get view matrix
+    auto viewMatrix = ComposeView(hmdTrackedPose.mDeviceToAbsoluteTracking, openVr->GetEyeToHeadTransform(vrEye));
     viewMatrix.translate_add(vCameraPosition);
     mView[vrEye].invert(viewMatrix);
     //mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop); // Interim revert for projection matrix testing
