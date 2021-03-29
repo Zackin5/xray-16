@@ -34,7 +34,6 @@
 #include "XR_IOConsole.h"
 #include "xr_input.h"
 #include "splash.h"
-#include "VrMaths.cpp"
 
 ENGINE_API CRenderDevice Device;
 ENGINE_API CLoadScreenRenderer load_screen_renderer;
@@ -290,110 +289,24 @@ void CRenderDevice::BeforeRender()
     mProjectSaved = mProject;
 }*/
 
-void CRenderDevice::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose) 
+void CRenderDevice::OpenVr_BeforeRender()
 {
-    // Get projection matrix (built from raw projection)
-    /*float pfLeft;
-    float pfRight;
-    float pfTop;
-    float pfBottom;
-    openVr->GetProjectionRaw(vrEye, &pfLeft, &pfRight, &pfTop, &pfBottom);
-    auto ovrProjection = ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, fNear, fFar, vrZoom);
-    mProject[vrEye].set(ovrProjection);*/
+    for (int i = 0; i < 2; i++)
+    {
+        // Calculate eye matrices
+        mFullTransform[i].mul(mProject[i], mView[i]);
+        GEnv.Render->SetCacheXform(mView[i], mProject[i]);
+        mInvFullTransform[i].invert_44(mFullTransform[i]);
 
-    // Get projection matrix (converted and multipled)
-    Fmatrix mirrorMatrix{};
-    mirrorMatrix._11 = 1.0f;
-    mirrorMatrix._12 = 0.0f;
-    mirrorMatrix._13 = 0.0f;
-    mirrorMatrix._14 = 0.0f;
-    mirrorMatrix._21 = 0.0f;
-    mirrorMatrix._22 = 1.0f;
-    mirrorMatrix._23 = 0.0f;
-    mirrorMatrix._24 = 0.0f;
-    mirrorMatrix._31 = 0.0f;
-    mirrorMatrix._32 = 0.0f;
-    mirrorMatrix._33 = -1.0f;
-    mirrorMatrix._34 = 0.0f;
-    mirrorMatrix._41 = 0.0f;
-    mirrorMatrix._42 = 0.0f;
-    mirrorMatrix._43 = 0.0f;
-    mirrorMatrix._44 = 1.0f;
-
-    auto ovrProjection = Matrix44ToFmatrix(openVr->GetProjectionMatrix(vrEye, fNear, fFar));
-    //mProject[vrEye].mul(ovrProjection, mirrorMatrix);
-    mProject[vrEye].set(ovrProjection);
-    
-    // Get view matrix (built from matrix values)
-    /*auto viewMatrix = ComposeView(hmdTrackedPose.mDeviceToAbsoluteTracking, openVr->GetEyeToHeadTransform(vrEye));
-    viewMatrix.translate_add(vCameraPosition);
-    mView[vrEye].invert(viewMatrix);*/
-    //mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop); // Interim revert for projection matrix testing
-
-    // Get view matrix (converted and multipled)
-    Fmatrix vmMirrorMatrix{};
-    vmMirrorMatrix._11 = 1.0f;
-    vmMirrorMatrix._12 = 0.0f;
-    vmMirrorMatrix._13 = 0.0f;
-    vmMirrorMatrix._14 = 0.0f;
-    vmMirrorMatrix._21 = 0.0f;
-    vmMirrorMatrix._22 = 1.0f;
-    vmMirrorMatrix._23 = 0.0f;
-    vmMirrorMatrix._24 = 0.0f;
-    vmMirrorMatrix._31 = 0.0f;
-    vmMirrorMatrix._32 = 0.0f;
-    vmMirrorMatrix._33 = -1.0f;
-    vmMirrorMatrix._34 = 0.0f;
-    vmMirrorMatrix._41 = 0.0f;
-    vmMirrorMatrix._42 = 0.0f;
-    vmMirrorMatrix._43 = 0.0f;
-    vmMirrorMatrix._44 = 1.0f;
-
-    auto viewMatrix = Matrix34ToFmatrix(hmdTrackedPose.mDeviceToAbsoluteTracking);
-    viewMatrix = viewMatrix.mul(viewMatrix, vmMirrorMatrix);
-    viewMatrix.translate_add(vCameraPosition);
-    mView[vrEye].invert(viewMatrix);
-
-    // Matrices
-    mFullTransform[vrEye].mul(mProject[vrEye], mView[vrEye]);
-    GEnv.Render->SetCacheXform(mView[vrEye], mProject[vrEye]);
-    mInvFullTransform[vrEye].invert_44(mFullTransform[vrEye]);
+        mFullTransformSaved[i] = mFullTransform[i];
+        mViewSaved[i] = mView[i];
+        mProjectSaved[i] = mProject[i];    
+    }
 
     vCameraPositionSaved = vCameraPosition;
     vCameraDirectionSaved = vCameraDirection;
     vCameraTopSaved = vCameraTop;
     vCameraRightSaved = vCameraRight;
-
-    mFullTransformSaved[vrEye] = mFullTransform[vrEye];
-    mViewSaved[vrEye] = mView[vrEye];
-    mProjectSaved[vrEye] = mProject[vrEye];
-}
-
-void CRenderDevice::OpenVr_BeforeRender()
-{
-    vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
-    vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
-
-    // Get HMD position
-    //vCameraPosition.add(Matrix34ToFVector(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking)); // Add HMD pos to player pos
-
-    // TODO: get HMD rotation (or: skip position, calculate view matrix directly?)
-    auto hmdQuarternion = Matrix34ToQuaternion(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking);
-    auto hmdYPR = QuaternionToYawPitchRoll(hmdQuarternion);
-    //vCameraDirection = QuaternionToYawPitchRoll(hmdQuarternion);
-    //vCameraDirection = QuaternionToAngles(hmdQuarternion);
-    //auto hmdYPR = Matrix34ToYPR(m_rTrackedDevicePose[0].mDeviceToAbsoluteTracking);
-    
-    // Inherit player yaw axis rotation
-    /*vCameraDirection.x = hmdYPR.x + vCameraDirection.x;
-    vCameraDirection.y = hmdYPR.y;
-    vCameraDirection.z = hmdYPR.z + vCameraDirection.z;*/
-    vCameraDirection.normalize();
-    vCameraTop.set(0, 1, 0);
-    vCameraRight.crossproduct(vCameraTop, vCameraDirection);
-
-    OpenVr_CalcEyeMatrix(vr::Eye_Left, m_rTrackedDevicePose[0]);
-    OpenVr_CalcEyeMatrix(vr::Eye_Right, m_rTrackedDevicePose[0]);
 }
 
 void CRenderDevice::OpenVr_PresentBufferToVR(vr::EVREye vrEye)

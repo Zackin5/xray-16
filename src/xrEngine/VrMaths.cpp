@@ -34,23 +34,15 @@ vr::HmdVector3_t Matrix34ToVector(vr::HmdMatrix34_t in)
 Fmatrix Matrix34ToFmatrix(vr::HmdMatrix34_t in)
 {
     Fmatrix out{};
-    
-    out._11 = in.m[0][0];
-    out._12 = in.m[1][0];
-    out._13 = in.m[2][0];
-    out._14 = 0.0f;
-    out._21 = in.m[0][1];
-    out._22 = in.m[1][1];
-    out._23 = in.m[2][1];
-    out._24 = 0.0f;
-    out._31 = in.m[0][2];
-    out._32 = in.m[1][2];
-    out._33 = in.m[2][2];
-    out._34 = 0.0f;
-    out._41 = in.m[0][3];
-    out._42 = in.m[1][3];
-    out._43 = in.m[2][3];
-    out._44 = 1.0f;
+    out._11 = in.m[0][0];    out._12 = in.m[1][0];    out._13 = in.m[2][0];    out._14 = 0.0f;
+    out._21 = in.m[0][1];    out._22 = in.m[1][1];    out._23 = in.m[2][1];    out._24 = 0.0f;
+    out._31 = -in.m[0][2];    out._32 = -in.m[1][2];    out._33 = -in.m[2][2];    out._34 = 0.0f;
+    out._41 = in.m[0][3];    out._42 = in.m[1][3];    out._43 = in.m[2][3];    out._44 = 1.0f;
+
+    /*out._11 = in.m[0][0];    out._21 = in.m[1][0];    out._31 = in.m[2][0];    out._14 = 0.0f;
+    out._12 = in.m[0][1];    out._22 = in.m[1][1];    out._32 = in.m[2][1];    out._24 = 0.0f;
+    out._13 = in.m[0][2];    out._23 = in.m[1][2];    out._33 = in.m[2][2];    out._34 = 0.0f;
+    out._41 = in.m[0][3];    out._42 = in.m[1][3];    out._43 = in.m[2][3];    out._44 = 1.0f;*/
 
     return out;
 }
@@ -59,22 +51,15 @@ Fmatrix Matrix34ToFmatrix(vr::HmdMatrix34_t in)
 Fmatrix Matrix44ToFmatrix(const vr::HmdMatrix44_t in)
 {
     Fmatrix out{};
-    out._11 = in.m[0][0];
-    out._12 = in.m[1][0];
-    out._13 = in.m[2][0];
-    out._14 = in.m[3][0];
-    out._21 = in.m[0][1];
-    out._22 = in.m[1][1];
-    out._23 = in.m[2][1];
-    out._24 = in.m[3][1];
-    out._31 = in.m[0][2];
-    out._32 = in.m[1][2];
-    out._33 = in.m[2][2];
-    out._34 = in.m[3][2];
-    out._41 = in.m[0][3];
-    out._42 = in.m[1][3];
-    out._43 = in.m[2][3];
-    out._44 = in.m[3][3];
+    out._11 = in.m[0][0];    out._12 = in.m[1][0];    out._13 = in.m[2][0];    out._14 = in.m[3][0];
+    out._21 = in.m[0][1];    out._22 = in.m[1][1];    out._23 = in.m[2][1];    out._24 = in.m[3][1];
+    out._31 = in.m[0][2];    out._32 = in.m[1][2];    out._33 = in.m[2][2];    out._34 = in.m[3][2];
+    out._41 = in.m[0][3];    out._42 = in.m[1][3];    out._43 = in.m[2][3];    out._44 = in.m[3][3];
+
+    /*out._11 = in.m[0][0];    out._21 = in.m[1][0];    out._31 = in.m[2][0];    out._14 = in.m[3][0];
+    out._12 = in.m[0][1];    out._22 = in.m[1][1];    out._32 = in.m[2][1];    out._24 = in.m[3][1];
+    out._13 = in.m[0][2];    out._23 = in.m[1][2];    out._33 = in.m[2][2];    out._34 = in.m[3][2];
+    out._41 = in.m[0][3];    out._42 = in.m[1][3];    out._43 = in.m[2][3];    out._44 = in.m[3][3];*/
     return out;
 }
 

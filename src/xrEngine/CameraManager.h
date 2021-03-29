@@ -4,6 +4,7 @@
 #include "xrCore/PostProcess/PPInfo.hpp"
 #include "xrCommon/xr_list.h"
 #include "xrCommon/xr_vector.h"
+#include "openvr\openvr.h"  // TODO: proper OpenVR external include
 
 using EffectorCamVec = xr_list<CEffectorCam*>;
 using EffectorPPVec = xr_vector<CEffectorPP*>;
@@ -61,6 +62,8 @@ public:
     void Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,
         float fFAR_Dest, u32 flags);
     void UpdateFromCamera(const CCameraBase* C);
+
+    void OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose);
 
     void ApplyDevice();
     static void ResetPP();

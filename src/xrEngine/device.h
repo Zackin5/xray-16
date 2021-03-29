@@ -238,8 +238,6 @@ public:
     void Clear();
     void RenderEnd();
 
-    void OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose);
-
     /*
     Renders current framebuffer texture to VR HMD eye
     */
