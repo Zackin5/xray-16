@@ -291,6 +291,10 @@ void CRenderDevice::BeforeRender()
 
 void CRenderDevice::OpenVr_BeforeRender()
 {
+    // OVR WaitGetPoses frame prep call
+    vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+    vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
+
     for (int i = 0; i < 2; i++)
     {
         // Calculate eye matrices
