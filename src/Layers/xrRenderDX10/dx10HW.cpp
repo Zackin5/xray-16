@@ -274,14 +274,6 @@ bool CHW::CreateSwapChain2(HWND hwnd)
     DXGI_SWAP_CHAIN_DESC1 desc{};
 
     // Back buffer
-    /*uint32_t* vrWidth{};
-    uint32_t* vrHeight{};
-
-    Device.openVr->GetRecommendedRenderTargetSize(vrWidth, vrHeight);
-
-    desc.Width = (UINT)*vrWidth;
-    desc.Height = (UINT)*vrHeight;*/
-
     desc.Width = Device.dwWidth;
     desc.Height = Device.dwHeight;
 
@@ -452,7 +444,7 @@ void CHW::Present()
     vr::Texture_t vrTex = {eyeTexture, vr::ETextureType::TextureType_DirectX, vr::EColorSpace::ColorSpace_Auto};
     
     auto error = vr::VRCompositor()->Submit((vr::EVREye)Device.activeRenderEye, &vrTex);
-    //VERIFY(error == vr::VRCompositorError_None);  // TODO: address issue where error thrown on loadscreen
+    VERIFY(error == vr::VRCompositorError_None); // TODO: address issue where error thrown on loadscreen
 
 #ifdef HAS_DX11_2
     if (m_pSwapChain2 && UsingFlipPresentationModel())

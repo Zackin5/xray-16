@@ -181,13 +181,9 @@ void CRenderDevice::SelectResolution(const bool windowed)
     {
         dwWidth = psCurrentVidMode[0] = 640;
         dwHeight = psCurrentVidMode[1] = 480;
+        return;
     }
-    else if (windowed)
-    {
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
-    }
-    else // check
+    else if (!windowed) // check
     {
         string32 buff;
         xr_sprintf(buff, sizeof(buff), "%dx%d", psCurrentVidMode[0], psCurrentVidMode[1]);
@@ -228,10 +224,12 @@ void CRenderDevice::SelectResolution(const bool windowed)
 
             Console->Execute(buff);
         }
-
-        dwWidth = psCurrentVidMode[0];
-        dwHeight = psCurrentVidMode[1];
     }
+
+    /*dwWidth = psCurrentVidMode[0];
+    dwHeight = psCurrentVidMode[1];*/
+    // OpenVR resolutions
+    openVr->GetRecommendedRenderTargetSize(&dwWidth, &dwHeight);
 }
 
 SDL_Window* CRenderDevice::GetApplicationWindow()

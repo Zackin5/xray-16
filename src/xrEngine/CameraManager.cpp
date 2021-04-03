@@ -328,62 +328,11 @@ void CCameraManager::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePos
         ComposeProjection(pfLeft, pfRight, pfTop, pfBottom, m_cam_info.fNear, m_cam_info.fFar, m_cam_info.fVrZoom);
     Device.mProject[vrEye].set(ovrProjection);
 
-    // Get projection matrix (converted and multipled)
-    /*Fmatrix mirrorMatrix{};
-    mirrorMatrix._11 = 1.0f;
-    mirrorMatrix._12 = 0.0f;
-    mirrorMatrix._13 = 0.0f;
-    mirrorMatrix._14 = 0.0f;
-    mirrorMatrix._21 = 0.0f;
-    mirrorMatrix._22 = 1.0f;
-    mirrorMatrix._23 = 0.0f;
-    mirrorMatrix._24 = 0.0f;
-    mirrorMatrix._31 = 0.0f;
-    mirrorMatrix._32 = 0.0f;
-    mirrorMatrix._33 = -1.0f;
-    mirrorMatrix._34 = 0.0f;
-    mirrorMatrix._41 = 0.0f;
-    mirrorMatrix._42 = 0.0f;
-    mirrorMatrix._43 = 0.0f;
-    mirrorMatrix._44 = 1.0f;
-
-    auto ovrProjection = Matrix44ToFmatrix(Device.openVr->GetProjectionMatrix(vrEye, m_cam_info.fNear, m_cam_info.fFar));
-    Device.mProject[vrEye].mul(ovrProjection, mirrorMatrix);
-    //Device.mProject[vrEye].set(ovrProjection);*/
-
     // Get view matrix (built from matrix values)
-    auto viewMatrix = ComposeView(hmdTrackedPose.mDeviceToAbsoluteTracking, Device.openVr->GetEyeToHeadTransform(vrEye));
-    viewMatrix.translate_add(m_cam_info.p);
+    auto viewMatrix = ComposeView(hmdTrackedPose.mDeviceToAbsoluteTracking, Device.openVr->GetEyeToHeadTransform(vrEye),
+        m_cam_info.p, m_cam_info.d);
+    
     Device.mView[vrEye].invert(viewMatrix);
-    // mView[vrEye].build_camera_dir(vCameraPosition, vCameraDirection, vCameraTop); // Interim revert for projection
-    // matrix testing
-
-    // Get view matrix (converted and multipled)
-    /*Fmatrix vmMirrorMatrix{};
-    vmMirrorMatrix._11 = 1.0f;
-    vmMirrorMatrix._12 = 0.0f;
-    vmMirrorMatrix._13 = 0.0f;
-    vmMirrorMatrix._14 = 0.0f;
-    vmMirrorMatrix._21 = 0.0f;
-    vmMirrorMatrix._22 = 1.0f;
-    vmMirrorMatrix._23 = 0.0f;
-    vmMirrorMatrix._24 = 0.0f;
-    vmMirrorMatrix._31 = 0.0f;
-    vmMirrorMatrix._32 = 0.0f;
-    vmMirrorMatrix._33 = -1.0f;
-    vmMirrorMatrix._34 = 0.0f;
-    vmMirrorMatrix._41 = 0.0f;
-    vmMirrorMatrix._42 = 0.0f;
-    vmMirrorMatrix._43 = 0.0f;
-    vmMirrorMatrix._44 = 1.0f;
-
-    auto eyeMatrix = Matrix34ToFmatrix(Device.openVr->GetEyeToHeadTransform(vrEye));
-    // eyeMatrix.invert(eyeMatrix);
-    auto viewMatrix = Matrix34ToFmatrix(hmdTrackedPose.mDeviceToAbsoluteTracking);
-     viewMatrix = viewMatrix.mul(viewMatrix, eyeMatrix);
-    // viewMatrix = viewMatrix.mul(viewMatrix, vmMirrorMatrix);
-    viewMatrix.translate_add(m_cam_info.p);
-    Device.mView[vrEye].invert(viewMatrix);*/
 }
 
 void CCameraManager::ApplyDevice()
