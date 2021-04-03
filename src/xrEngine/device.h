@@ -108,13 +108,8 @@ public:
     Fmatrix mProjectSaved[2];
     Fmatrix mFullTransformSaved[2];
 
-    float vrZoom = 1.f;
     float fFOV;
     float fASPECT;
-
-    // TODO: this are just copied from CameraManager, find a proper hookup
-    float fNear;
-    float fFar;
 
 protected:
     u32 Timer_MM_Delta;

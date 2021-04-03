@@ -136,11 +136,33 @@ Fvector HmdVectorToFVector(vr::HmdVector3_t v)
 
 Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose) 
 {
+    /*Fmatrix out{};
+    out._11 = devicePose.m[0][0];
+    out._12 = devicePose.m[1][0];
+    out._13 = devicePose.m[2][0];
+    out._14 = 0.0f;
+    out._21 = devicePose.m[0][1];
+    out._22 = devicePose.m[1][1];
+    out._23 = devicePose.m[2][1];
+    out._24 = 0.0f;
+    out._31 = -devicePose.m[0][2];
+    out._32 = -devicePose.m[1][2];
+    out._33 = -devicePose.m[2][2];
+    out._34 = 0.0f;
+    out._41 = devicePose.m[0][3];
+    out._42 = devicePose.m[1][3];
+    out._43 = devicePose.m[2][3];
+    out._44 = 1.0f;
+
+    auto eyeMatrix = Matrix34ToFmatrix(eyePose);
+    out = out.mul(out, eyeMatrix);
+    return out;*/
+
     // TODO: add eye offset
-    Fvector hmdForward = Fvector{   // OVR uses RH coordinates, flip to XRay LH
-        -devicePose.m[0][2], 
-        -devicePose.m[1][2], 
-        -devicePose.m[2][2]};
+    Fvector hmdForward = Fvector{   
+        devicePose.m[0][2], 
+        devicePose.m[1][2], 
+        devicePose.m[2][2]};
 
     Fvector hmdUp = Fvector{
         devicePose.m[0][1], 
@@ -157,8 +179,17 @@ Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose)
         devicePose.m[1][3], 
         devicePose.m[2][3]};
 
+    Fvector vForward = Fvector{0.0f, 0.0f, 1.0};
+    Fvector vUp = Fvector{0.0f, 1.0f, 0.0};
+    Fvector vRight = Fvector{1.0f, 0.0f, 0.0};
+
+    // OVR uses RH coordinates, flip to XRay LH
+    hmdForward = hmdForward.reflect(hmdForward, vForward);
+    hmdUp = hmdUp.reflect(hmdUp, vForward);
+    hmdRight = hmdRight.reflect(hmdRight, vForward);
+
     Fmatrix viewMatrix{};
-    /*viewMatrix._11 = hmdRight.x;
+    viewMatrix._11 = hmdRight.x;
     viewMatrix._12 = hmdRight.y;
     viewMatrix._13 = hmdRight.z;
     viewMatrix._14 = 0.0f;
@@ -173,7 +204,10 @@ Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose)
     viewMatrix._41 = hmdTransaction.x;
     viewMatrix._42 = hmdTransaction.y;
     viewMatrix._43 = hmdTransaction.z;
-    viewMatrix._44 = 1.0f;*/
+    viewMatrix._44 = 1.0f;
+
+    auto eyeMatrix = Matrix34ToFmatrix(eyePose);
+    viewMatrix = viewMatrix.mul(viewMatrix, eyeMatrix);
 
     /*viewMatrix._11 = hmdRight.x;    viewMatrix._12 = hmdUp.x;    viewMatrix._13 = hmdForward.x;    viewMatrix._14 = 0.0f;
     viewMatrix._21 = hmdRight.y;    viewMatrix._22 = hmdUp.y;    viewMatrix._23 = hmdForward.y;    viewMatrix._24 = 0.0f;

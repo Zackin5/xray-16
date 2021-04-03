@@ -18,6 +18,7 @@ struct ENGINE_API SCamEffectorInfo
     Fvector d;
     Fvector n;
     Fvector r;
+    float fVrZoom = 1.0f;
     float fFov;
     float fNear;
     float fFar;
@@ -33,6 +34,7 @@ struct ENGINE_API SCamEffectorInfo
         d = other.d;
         n = other.n;
         r = other.r;
+        fVrZoom = other.fVrZoom;
         fFov = other.fFov;
         fNear = other.fNear;
         fFar = other.fFar;
