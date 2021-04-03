@@ -33,6 +33,18 @@ protected:
     virtual bool ProcessCameraEffector(CEffectorCam* eff);
     void OnEffectorReleased(SBaseEffector* e);
 
+    /// <summary>
+    /// Calculates the caerma view and proejction matrixes for the eye index
+    /// </summary>
+    /// <param name="vrEye"></param>
+    /// <param name="hmdTrackedPose"></param>
+    void OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose);
+
+    /// <summary>
+    /// Updates device FOV and aspect values with HMD properties
+    /// </summary>
+    void OpenVr_AssignCameraProperties();
+
 public:
 #ifdef DEBUG
     u32 dbg_upd_frame;
@@ -63,8 +75,6 @@ public:
     void Update(const Fvector& P, const Fvector& D, const Fvector& N, float fFOV_Dest, float fASPECT_Dest,
         float fFAR_Dest, u32 flags);
     void UpdateFromCamera(const CCameraBase* C);
-
-    void OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePose_t hmdTrackedPose);
 
     void ApplyDevice();
     static void ResetPP();

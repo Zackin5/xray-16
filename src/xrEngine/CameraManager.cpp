@@ -335,21 +335,21 @@ void CCameraManager::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePos
     Device.mView[vrEye].invert(viewMatrix);
 }
 
+void CCameraManager::OpenVr_AssignCameraProperties() 
+{
+    Device.fFOV = 2.0 * atan(1.0 / Device.mProject[0]._11) * 180.0 / PI;
+    Device.fASPECT = Device.dwWidth / (float)Device.dwHeight;
+}
+
 void CCameraManager::ApplyDevice()
 {
     // Device params
-    //Device.mView[0].build_camera_dir(m_cam_info.p, m_cam_info.d, m_cam_info.n);
-
     Device.vCameraPosition.set(m_cam_info.p);
     Device.vCameraDirection.set(m_cam_info.d);
     Device.vCameraTop.set(m_cam_info.n);
     Device.vCameraRight.set(m_cam_info.r);
 
-    // projection
-    Device.fFOV = m_cam_info.fFov;
-    Device.fASPECT = m_cam_info.fAspect;
-    //Device.mProject[0].build_projection(deg2rad(m_cam_info.fFov), m_cam_info.fAspect, m_cam_info.fNear, m_cam_info.fFar);
-    
+    // projection    
     // Get HMD pose and view\projection
     vr::TrackedDevicePose_t hmdPose{};
     Device.openVr->GetDeviceToAbsoluteTrackingPose(
@@ -357,6 +357,8 @@ void CCameraManager::ApplyDevice()
 
     OpenVr_CalcEyeMatrix(vr::Eye_Left, hmdPose);
     OpenVr_CalcEyeMatrix(vr::Eye_Right, hmdPose);
+
+    OpenVr_AssignCameraProperties();
     
     // Apply offset required for Nvidia Ansel
     //Device.mProject[Device.activeRenderEye]._31 = -m_cam_info.offsetX;

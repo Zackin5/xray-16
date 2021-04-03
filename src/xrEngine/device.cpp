@@ -295,11 +295,6 @@ void CRenderDevice::OpenVr_BeforeRender()
     vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
     vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
-    // Brute force override resolution TODO: properly hook this up at device init?
-    /*openVr->GetRecommendedRenderTargetSize(&dwWidth, &dwHeight);
-    fWidth_2 = dwWidth / 2.f;
-    fHeight_2 = dwHeight / 2.f;*/
-
     for (int i = 0; i < 2; i++)
     {
         // Calculate eye matrices
