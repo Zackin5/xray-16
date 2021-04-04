@@ -348,12 +348,12 @@ void CCameraManager::ApplyDevice()
     Device.vCameraDirection.set(m_cam_info.d);
     Device.vCameraTop.set(m_cam_info.n);
     Device.vCameraRight.set(m_cam_info.r);
-
+    
     // projection    
     // Get HMD pose and view\projection
     vr::TrackedDevicePose_t hmdPose{};
     Device.openVr->GetDeviceToAbsoluteTrackingPose(
-        vr::ETrackingUniverseOrigin::TrackingUniverseSeated, 0.0, &hmdPose, 1);
+        vr::ETrackingUniverseOrigin::TrackingUniverseSeated, GetPredictedPhotonTime(Device.openVr), &hmdPose, 1);
 
     OpenVr_CalcEyeMatrix(vr::Eye_Left, hmdPose);
     OpenVr_CalcEyeMatrix(vr::Eye_Right, hmdPose);

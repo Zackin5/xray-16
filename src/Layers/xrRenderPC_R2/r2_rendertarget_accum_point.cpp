@@ -17,10 +17,12 @@ void CRenderTarget::accum_point(light* L)
         extern ENGINE_API float psHUD_FOV;
         Pold = Device.mProject[Device.activeRenderEye];
         FTold = Device.mFullTransform[Device.activeRenderEye];
-        Device.mProject[Device.activeRenderEye].build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
-            VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
 
-        Device.mFullTransform[Device.activeRenderEye].mul(Device.mProject[Device.activeRenderEye], Device.mView[Device.activeRenderEye]);
+        // OpenVR TODO: update this reprojection
+        //Device.mProject[Device.activeRenderEye].build_projection(deg2rad(psHUD_FOV * Device.fFOV /* *Device.fASPECT*/), Device.fASPECT,
+            //VIEWPORT_NEAR, g_pGamePersistent->Environment().CurrentEnv->far_plane);
+
+        //Device.mFullTransform[Device.activeRenderEye].mul(Device.mProject[Device.activeRenderEye], Device.mView[Device.activeRenderEye]);
         RCache.set_xform_project(Device.mProject[Device.activeRenderEye]);
         RImplementation.rmNear();
     }

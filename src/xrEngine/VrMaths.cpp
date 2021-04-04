@@ -283,3 +283,17 @@ Fmatrix ComposeProjection(float fLeft, float fRight, float fTop, float fBottom, 
     return p.mul(p, mirrorMatrix);
     //return p;
 }
+
+float GetPredictedPhotonTime(vr::IVRSystem* pVRSystem) 
+{
+    float fSecondsSinceLastVsync;
+    pVRSystem->GetTimeSinceLastVsync(&fSecondsSinceLastVsync, NULL);
+
+    float fDisplayFrequency =
+        pVRSystem->GetFloatTrackedDeviceProperty(vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_DisplayFrequency_Float);
+    float fFrameDuration = 1.f / fDisplayFrequency;
+    float fVsyncToPhotons = pVRSystem->GetFloatTrackedDeviceProperty(
+        vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SecondsFromVsyncToPhotons_Float);
+
+    return fFrameDuration - fSecondsSinceLastVsync + fVsyncToPhotons;
+}
