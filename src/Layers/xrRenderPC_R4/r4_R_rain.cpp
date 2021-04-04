@@ -262,5 +262,5 @@ void CRender::render_rain()
 
     // Accumulate
     Target->phase_rain();
-    Target->draw_rain(RainLight);
+    //Target->draw_rain(RainLight); // TODO: OpenVR fix rain normalmap issue
 }
