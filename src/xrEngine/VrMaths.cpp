@@ -134,6 +134,13 @@ Fvector HmdVectorToFVector(vr::HmdVector3_t v)
     return out;
 }
 
+Fvector GetHmdPosition(vr::HmdMatrix34_t devicePose) 
+{
+    Fvector hmdTransaction = Fvector{devicePose.m[0][3], devicePose.m[1][3], devicePose.m[2][3]};
+    Fvector vForward = Fvector{0.0f, 0.0f, 1.0};
+    return hmdTransaction.reflect(hmdTransaction, vForward);
+}
+
 Fmatrix ComposeView(vr::HmdMatrix34_t devicePose, vr::HmdMatrix34_t eyePose, Fvector playerPos, Fvector playerRot) 
 {
     // Get HMD orientation

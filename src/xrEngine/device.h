@@ -91,6 +91,8 @@ public:
     Fvector vCameraTop;
     Fvector vCameraRight;
 
+    Fvector vHmdPosition;
+
     // Index 0 is left eye, 1 is right eye
     Fmatrix mView[2];
     Fmatrix mProject[2];

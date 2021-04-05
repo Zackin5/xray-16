@@ -359,6 +359,8 @@ void CCameraManager::ApplyDevice()
     OpenVr_CalcEyeMatrix(vr::Eye_Right, hmdPose);
 
     OpenVr_AssignCameraProperties();
+
+    Device.vHmdPosition.set(GetHmdPosition(hmdPose.mDeviceToAbsoluteTracking));
     
     // Apply offset required for Nvidia Ansel
     //Device.mProject[Device.activeRenderEye]._31 = -m_cam_info.offsetX;

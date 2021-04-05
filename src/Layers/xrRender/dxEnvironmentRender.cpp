@@ -217,6 +217,7 @@ void dxEnvironmentRender::OnLoad()
 void dxEnvironmentRender::OnUnload() { tonemap = nullptr; }
 void dxEnvironmentRender::RenderSky(CEnvironment& env)
 {
+    PIX_EVENT(RENDER_SKY);
     // clouds_sh.create		("clouds","null");
     //. this is the bug-fix for the case when the sky is broken
     //. for some unknown reason the geoms happen to be invalid sometimes
@@ -239,7 +240,10 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     // draw sky box
     Fmatrix mSky;
     mSky.rotateY(env.CurrentEnv->sky_rotation);
-    mSky.translate_over(Device.vCameraPosition);
+
+    auto cameraPosition = Device.vCameraPosition;
+    cameraPosition.add(Device.vHmdPosition);
+    mSky.translate_over(cameraPosition);
 
     u32 i_offset, v_offset;
     u32 C = color_rgba(iFloor(env.CurrentEnv->sky_color.x * 255.f), iFloor(env.CurrentEnv->sky_color.y * 255.f),
