@@ -240,10 +240,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     // draw sky box
     Fmatrix mSky;
     mSky.rotateY(env.CurrentEnv->sky_rotation);
-
-    auto cameraPosition = Device.vCameraPosition;
-    cameraPosition.add(Device.vHmdPosition);
-    mSky.translate_over(cameraPosition);
+    mSky.translate_over(Device.vCameraPosition);
 
     u32 i_offset, v_offset;
     u32 C = color_rgba(iFloor(env.CurrentEnv->sky_color.x * 255.f), iFloor(env.CurrentEnv->sky_color.y * 255.f),
@@ -261,6 +258,7 @@ void dxEnvironmentRender::RenderSky(CEnvironment& env)
     RCache.Vertex.Unlock(12, sh_2geom.stride());
 
     // Render
+    // xxxovr: render at infinity
     RCache.set_xform_world(mSky);
     RCache.set_Geometry(sh_2geom);
     RCache.set_Shader(sh_2sky);

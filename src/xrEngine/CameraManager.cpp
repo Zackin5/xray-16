@@ -333,6 +333,12 @@ void CCameraManager::OpenVr_CalcEyeMatrix(vr::EVREye vrEye, vr::TrackedDevicePos
         m_cam_info.p, m_cam_info.d);
     
     Device.mView[vrEye].invert(viewMatrix);
+
+    // update eye camera position
+    auto cameraPos = GetHmdPosition(hmdTrackedPose.mDeviceToAbsoluteTracking);
+    cameraPos.add(m_cam_info.p);
+
+    Device.vCameraPosition.set(cameraPos);
 }
 
 void CCameraManager::OpenVr_AssignCameraProperties() 
@@ -344,7 +350,6 @@ void CCameraManager::OpenVr_AssignCameraProperties()
 void CCameraManager::ApplyDevice()
 {
     // Device params
-    Device.vCameraPosition.set(m_cam_info.p);
     Device.vCameraDirection.set(m_cam_info.d);
     Device.vCameraTop.set(m_cam_info.n);
     Device.vCameraRight.set(m_cam_info.r);
@@ -359,8 +364,6 @@ void CCameraManager::ApplyDevice()
     OpenVr_CalcEyeMatrix(vr::Eye_Right, hmdPose);
 
     OpenVr_AssignCameraProperties();
-
-    Device.vHmdPosition.set(GetHmdPosition(hmdPose.mDeviceToAbsoluteTracking));
     
     // Apply offset required for Nvidia Ansel
     //Device.mProject[Device.activeRenderEye]._31 = -m_cam_info.offsetX;

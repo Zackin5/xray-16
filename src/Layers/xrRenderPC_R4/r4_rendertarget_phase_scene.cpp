@@ -46,6 +46,27 @@ void CRenderTarget::phase_scene_prepare()
     //	Igor: for volumetric lights
     m_bHasActiveVolumetric = false;
     //	Clear later if try to draw volumetric
+
+    // xxxovr: Draw OpenVR hidden area occlusion mesh
+    /*auto ovrHiddenMesh = Device.openVr->GetHiddenAreaMesh((vr::EVREye)Device.activeRenderEye);
+
+    if (ovrHiddenMesh.unTriangleCount > 0)
+    {
+        RCache.set_CullMode(CULL_NONE);
+
+        u32 Offset;
+        u32 C = color_rgba(0, 0, 0, 255);
+        FVF::TL* pv = (FVF::TL*)RCache.Vertex.Lock(ovrHiddenMesh.unTriangleCount, g_combine->vb_stride, Offset);
+
+        for (int i = 0; i < ovrHiddenMesh.unTriangleCount; i++)
+        {
+            pv->set(ovrHiddenMesh.pVertexData[i].v[0], ovrHiddenMesh.pVertexData[i].v[1], 0, C, 0, 0, 0);
+            pv++;        
+        }
+
+        RCache.Vertex.Unlock(4, g_combine->vb_stride);
+        RCache.Render(D3DPT_TRIANGLELIST, Offset, 0, ovrHiddenMesh.unTriangleCount, 0, 2);
+    }*/
 }
 
 // begin
